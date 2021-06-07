@@ -29,8 +29,7 @@
 ## Greedy and Backtracking
 
 
-0) Math
-=================================================================================================================================================================
+## Math
 | #     | Title	               | url                                                 | Time     | Space | Difficulty | Tag	      | Note                   |
 | 0149  | Max Points on a Line | https://leetcode.com/problems/max-points-on-a-line/ | O(n^2)	| O(n)  | Hard       |            |                        |
 # The Math Behind the Solution
@@ -158,9 +157,11 @@ SC: O(N)   ... Storing the result in a dictionary <key=<int, int>, value=count>.
 ```python
 # Solution 1>
 # ---------------------
-# Prefer this over Solution 2 in an interview setting.
-class Solution2:
-    def gcd(self, a, b):
+# Prefer this over Solution-2 in an interview setting.
+from typing import List
+
+class Solution:
+    def gcd(self, a: int, b: int) -> int:
         return gcd(b % a, a) if a != 0 else b
 			
     def maxPoints(self, points: List[List[int]]) -> int:
@@ -221,12 +222,13 @@ class Solution2:
 # 2) collections.defaultdict
 # 3) collections.Counter
 #		- most_common
-from collections import defaultdict
+import collections
 from itertools import combinations
 from math import gcd
+from typing import List
 
-class Solution(object):
-    def maxPoints(self, points):
+class Solution:
+    def maxPoints(self, points: List[List[int]]) -> int:
         # Represent line uniquely as (a,b,c) where ax+by+c=0 and
         # a>0 or (a==0 and b>0) or (a==0 and b==0).
         if not points:
@@ -257,13 +259,16 @@ class Solution(object):
 </div>
 <br/>
 
-=================================================================================================================================================================
-1) String
-=================================================================================================================================================================
-
+## String
 | #     | Title	                                         | url                                                                           | Time   | Space | Difficulty | Tag	      | Note                   |
 | 0149  | Longest Substring Without Repeating Characters | https://leetcode.com/problems/longest-substring-without-repeating-characters/ | O(n)	  | O(1)  | Medium     |              |                        |
 | 0424  | Longest Repeating Character Replacement        | https://leetcode.com/problems/longest-repeating-character-replacement/        | O(n)	  | O(1)  | Medium     |              | Sliding Window         |
 | 0076  | Minimum Window Substring                       | https://leetcode.com/problems/minimum-window-substring/                       | O(n)   | O(k)  | Hard       |              |                        |
 | 0242  | Valid Anagram                                  | https://leetcode.com/problems/valid-anagram/                                  | O(n)   | O(1)  | Easy       |              |                        |
 | 0049  | Group Anagrams                                 | https://leetcode.com/problems/group-anagrams/                                 | O(n)   | O(1)  | Easy       |              |                        |
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
