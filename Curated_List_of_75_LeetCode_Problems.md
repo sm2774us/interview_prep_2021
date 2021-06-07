@@ -153,7 +153,7 @@ TC: O(N^2) ... Test all pairs: O(N^2)
 SC: O(N)   ... Storing the result in a dictionary <key=<int, int>, value=count>.
                Considering all points are distinct we will have n entries in dictionary.
 ```
-##### Solution-1 (Prefer this solution in an interview setting)
+##### Solution-1 ( Prefer this solution in an interview setting ).
 ```python
 from typing import List
 
@@ -211,7 +211,7 @@ class Solution:
         # edge case: return 0 for 0 point, 1 for 1 point
         return max(map(len, pointsInLine.values())) if pointsInLine else len(points)
 ```
-##### Solution-2 (Uses Python built-ins `math.gcd`, `itertools.combinations` and `collections.Counter.most_common` and data structures `collections.defaultdict` and `collections.Counter`)
+##### Solution-2 ( Uses Python built-ins `math.gcd`, `itertools.combinations` and `collections.Counter.most_common` and data structures `collections.defaultdict` and `collections.Counter` ).
 ```python
 import collections
 from itertools import combinations
