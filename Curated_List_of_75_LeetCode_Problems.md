@@ -33,7 +33,7 @@
 | #     | Title	               | url                                                 | Time     | Space | Difficulty | Tag	      | Note                   |
 | ----- | -------------------- | --------------------------------------------------- | -------- | ----- | ---------- | ---------- | ---------------------- |
 | 0149  | Max Points on a Line | https://leetcode.com/problems/max-points-on-a-line/ | O(n^2)	| O(n)  | Hard       |            |                        |
-# The Math Behind the Solution
+##### The Math Behind the Solution
 ```
 Q1> What is the equation of a line, in the form:
 ax + by + c = 0, 
@@ -98,9 +98,8 @@ Dividing both sides by -3:
 
 And that’s the answer.
 ```
+##### Solution Explanation
 ```
-Solution Explanation
------------------------
 1) Remember from Euclidean Geometry that the general equation of a line is represented as: 
 ax + by + c = 0
 or
@@ -148,17 +147,14 @@ a, b, c = y1 - y2, x2 - x1, x1 * y2 - x2 * y1
 8) get max on the length of values (x and y coordinates of each point that constitutes a line) in the result dictionary -> pointsInLine 
    and that is your answer
 ```
+##### Complexity Analysis
 ```
-#Complexity Analysis
-# ---------------------
 TC: O(N^2) ... Test all pairs: O(N^2)
 SC: O(N)   ... Storing the result in a dictionary <key=<int, int>, value=count>.
                Considering all points are distinct we will have n entries in dictionary.
 ```
+##### Solution-1 (Prefer this solution in an interview setting)
 ```python
-# Solution 1>
-# ---------------------
-# Prefer this over Solution-2 in an interview setting.
 from typing import List
 
 class Solution:
@@ -215,14 +211,8 @@ class Solution:
         # edge case: return 0 for 0 point, 1 for 1 point
         return max(map(len, pointsInLine.values())) if pointsInLine else len(points)
 ```
+##### Solution-2 (Uses Python built-ins `math.gcd`, `itertools.combinations` and `collections.Counter.most_common` and data structures `collections.defaultdict` and `collections.Counter`)
 ```python
-# Solution 2>
-# ---------------------
-# Easier solution using Python built-ins:
-# 1) itertools.combinations
-# 2) collections.defaultdict
-# 3) collections.Counter
-#		- most_common
 import collections
 from itertools import combinations
 from math import gcd
