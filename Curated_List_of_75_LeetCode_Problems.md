@@ -31,6 +31,7 @@
 
 ## Math
 | #     | Title	               | url                                                 | Time     | Space | Difficulty | Tag	      | Note                   |
+| ----- | -------------------- | --------------------------------------------------- | -------- | ----- | ---------- | ---------- | ---------------------- |
 | 0149  | Max Points on a Line | https://leetcode.com/problems/max-points-on-a-line/ | O(n^2)	| O(n)  | Hard       |            |                        |
 # The Math Behind the Solution
 ```
@@ -261,6 +262,7 @@ class Solution:
 
 ## String
 | #     | Title	                                         | url                                                                           | Time   | Space | Difficulty | Tag	      | Note                   |
+| ----- | ---------------------------------------------- | ----------------------------------------------------------------------------- | ------ | ----- | ---------- | ------------ | ---------------------- |
 | 0149  | Longest Substring Without Repeating Characters | https://leetcode.com/problems/longest-substring-without-repeating-characters/ | O(n)	  | O(1)  | Medium     |              |                        |
 | 0424  | Longest Repeating Character Replacement        | https://leetcode.com/problems/longest-repeating-character-replacement/        | O(n)	  | O(1)  | Medium     |              | Sliding Window         |
 | 0076  | Minimum Window Substring                       | https://leetcode.com/problems/minimum-window-substring/                       | O(n)   | O(k)  | Hard       |              |                        |
