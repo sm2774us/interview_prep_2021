@@ -43,7 +43,7 @@
 | 1390  | Four Divisors        | https://leetcode.com/problems/four-divisors/        | _O(N+K*Log(Log(K)))_, where, N = max(nums), M=len(nums), K is len(primes) | _O(N+M+K^2)_, where, N = max(nums), M=len(nums), K is len(primes) | Medium     |                                     | Sieve of Eratosthenes  |
 | 1390  | Four Divisors        | https://leetcode.com/problems/four-divisors/        | _O(N * sqrt(M))_, where, N = length of nums and M = nums[i]  | _O(1)_       | Medium     |                                     | Recursion              |
 #### [LC-12:Integer to Roman](https://leetcode.com/problems/integer-to-roman/)
-#### Solution Explanation
+##### Solution Explanation
 ```
 Idea:
 
@@ -53,7 +53,7 @@ as many times as we can while reducing the our target number (N) by the same amo
 
 Once N runs out, we can return ans.
 ```
-#### Complexity Analysis
+##### Complexity Analysis
 ```
 TC: O(13) = O(1), iterate the length of dictionary keys
 SC: O(13) = O(1), one hash map (dictionary)
@@ -98,8 +98,14 @@ class Solution(object):
         return roman
 ```
 
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
 #### [LC-13:Roman to Integer](https://leetcode.com/problems/roman-to-integer/)
-#### Solution Explanation
+##### Solution Explanation
 ```
 Approach:
 
@@ -108,7 +114,7 @@ Go through each numeral in the input string
 If numeral is smaller than the next numeral in the input we have a value like IV so subtract the current numeral from the next numeral.
 Else add the value of the numeral to our result.
 ```
-#### Complexity Analysis
+##### Complexity Analysis
 ```
 TC: O(N)
 SC: O(1)
@@ -149,7 +155,14 @@ class Solution:
             result += current_num
             index += 1
             
-        return result```
+        return result
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
 
 #### [LC-149:Max Points on a Line](https://leetcode.com/problems/max-points-on-a-line/)
 ##### The Math Behind the Solution
@@ -470,7 +483,6 @@ Make your code faster:
   * Do not use function sqrt, because it is expensive [do not use: m < sqrt(n)].
     Instead, use: m * m < n.
 ```
-
 ##### Complexity Analysis
 ```
 TC: O( N* Log(Log(N)) )
@@ -648,6 +660,12 @@ class Solution:
             b = b >> 1
         return ans
 ```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
 
 #### [LC-509:Fibonacci Number](https://leetcode.com/problems/fibonacci-number/)
 ##### Solution-1 ( Using Binet's Formula or the Golden Ratio  ).
