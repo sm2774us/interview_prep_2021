@@ -30,11 +30,127 @@
 
 
 ## Math
-| #     | Title	               | url                                                 | Time                  | Space   | Difficulty | Tag	                              | Note                   |
-| ----- | -------------------- | --------------------------------------------------- | --------------------- | ------- | ---------- | ----------------------------------- | ---------------------- |
-| 0149  | Max Points on a Line | https://leetcode.com/problems/max-points-on-a-line/ | _O(n^2)_	             | _O(n)_  | Hard       |                                     | Linear Equation `ax + by + c = 0` |
-| 0204  | Count Primes         | https://leetcode.com/problems/count-primes/         | _O( N* Log(Log(N)) )_ | _O(N)_  | Easy       |                                     | Sieve of Eratosthenes  |
-| 0509  | Fibonacci Number     | https://leetcode.com/problems/fibonacci-number/     | _O(logn)_             | _O(1)_  | Easy       | variant of [Climbing Stairs](https://leetcode.com/problems/climbing-stairs/) | Matrix Exponentiation, Binet's Formula |
+| #     | Title	               | url                                                 | Time                  | Space        | Difficulty | Tag	                               | Note                   |
+| ----- | -------------------- | --------------------------------------------------- | --------------------- | ------------ | ---------- | ----------------------------------- | ---------------------- |
+| 0012  | Integer to Roman     | https://leetcode.com/problems/integer-to-roman/     | _O(n)_                | _O(1)_       | Medium     |                                     |                        |
+| 0013  | Roman to Integer     | https://leetcode.com/problems/roman-to-integer/     | _O(n)_                | _O(1)_       | Easy       |                                     |                        |
+| 0029  | Divide Two Integers  | https://leetcode.com/problems/divide-two-integers/  | _O(1)_                | _O(1)_       | Medium     |                                     |                        |
+| 0050  | Pow(x, n)            | https://leetcode.com/problems/powx-n/               | _O(1)_                | _O(1)_       | Medium     |                                     |                        |
+| 0149  | Max Points on a Line | https://leetcode.com/problems/max-points-on-a-line/ | _O(n^2)_	             | _O(n)_       | Hard       |                                     | Linear Equation `ax + by + c = 0` |
+| 0204  | Count Primes         | https://leetcode.com/problems/count-primes/         | _O( N*Log(Log(N)) )_  | _O(N)_       | Easy       |                                     | Sieve of Eratosthenes  |
+| 0372  | Super Pow            | https://leetcode.com/problems/super-pow/            | _O(n)_                | _O(1)_       | Medium     |                                     |                        |
+| 0509  | Fibonacci Number     | https://leetcode.com/problems/fibonacci-number/     | _O(logn)_             | _O(1)_       | Easy       | variant of [Climbing Stairs](https://leetcode.com/problems/climbing-stairs/) | Matrix Exponentiation, Binet's Formula |
+| 1390  | Four Divisors        | https://leetcode.com/problems/four-divisors/        | _O(N+K*Log(Log(K)))_, where, N = max(nums), M=len(nums), K is len(primes) | _O(N+M+K^2)_, where, N = max(nums), M=len(nums), K is len(primes) | Medium     |                                     | Sieve of Eratosthenes  |
+| 1390  | Four Divisors        | https://leetcode.com/problems/four-divisors/        | _O(N * sqrt(M))_, where, N = length of nums and M = nums[i]  | _O(1)_       | Medium     |                                     | Recursion              |
+#### [LC-12:Integer to Roman](https://leetcode.com/problems/integer-to-roman/)
+#### Solution Explanation
+```
+Idea:
+
+Just like Roman to Integer, this problem is most easily solved using a lookup table (dictionary) for the conversion between digit and numeral. 
+In this case, we can easily deal with the values in descending order and insert the appropriate numeral (or numerals) 
+as many times as we can while reducing the our target number (N) by the same amount.
+
+Once N runs out, we can return ans.
+```
+#### Complexity Analysis
+```
+TC: O(13) = O(1), iterate the length of dictionary keys
+SC: O(13) = O(1), one hash map (dictionary)
+```
+```python
+class Solution(object):
+    def __init__(self):
+        self.value_map = {
+			1000: 'M',
+			900: 'CM',
+			500: 'D',
+			400: 'CD',
+			100: 'C',
+			90: 'XC',
+			50: 'L',
+			40: 'XL',
+			10: 'X',
+			9: 'IX',
+            5: 'V',
+			4: 'IV',
+			1: 'I'
+        }
+
+    def intToRoman(self, num):
+        """
+        :type num: int
+        :rtype: str
+        """
+
+        #d = {1000: 'M', 900: 'CM', 500: 'D', 400: 'CD', 100: 'C', 90: 'XC', 50: 'L', 40: 'XL', 10: 'X', 9: 'IX',
+        #     5: 'V', 4: 'IV', 1: 'I'}
+		##d = {1: 'I', 4: 'IV', 5: 'V', 9: 'IX', 10: 'X', 40: 'XL', 50: 'L', 90: 'XC', 100: 'C', 400: 'CD',
+		##     500: 'D', 900: 'CM', 1000: 'M'}
+        roman = ""
+
+		for v in sorted(self.value_map.keys(), reverse=True):
+        #for v in sorted(d.keys(), reverse=True):
+		##for v in d.keys():
+            roman += (num // v) * self.value_map[v]
+            num -= (num // v) * v
+
+        return roman
+```
+
+#### [LC-13:Roman to Integer](https://leetcode.com/problems/roman-to-integer/)
+#### Solution Explanation
+```
+Approach:
+
+Use dictionary for fast and easy lookup of numeral to integer value.
+Go through each numeral in the input string
+If numeral is smaller than the next numeral in the input we have a value like IV so subtract the current numeral from the next numeral.
+Else add the value of the numeral to our result.
+```
+#### Complexity Analysis
+```
+TC: O(N)
+SC: O(1)
+```
+```python
+class Solution:
+    
+    def __init__(self):
+        self.value_map = {
+            'I': 1,
+            'V': 5,
+            'X': 10,
+            'L': 50,
+            'C': 100,
+            'D': 500,
+            'M': 1000
+        }
+    
+    def romanToInt(self, s: str) -> int:
+        result = 0
+        index = 0
+        length = len(s)
+        
+        while index < length:
+            current_num = self.value_map[s[index]]
+            
+            # Check next value to see if it is larger. If
+            # it is that means that the we are dealing with
+            # something like 4 'IV' and see need to subtract
+            # the current numeral from next
+            if index+1 < length:
+                next_num = self.value_map[s[index+1]]
+                if next_num > current_num:
+                    current_num = next_num - current_num
+                    # Skip ahead an additional index since we combined two numerals
+                    index += 1
+            
+            result += current_num
+            index += 1
+            
+        return result```
+
 #### [LC-149:Max Points on a Line](https://leetcode.com/problems/max-points-on-a-line/)
 ##### The Math Behind the Solution
 ```
@@ -299,8 +415,6 @@ The next number not yet crossed out in the list after 5 is 7; the next step woul
 > 2  3     5     7           11    13          17    19          23                29
 ```
 -------------------------
-Algorithm
--------------------------
 Pseudocode
 -------------------------
 The sieve of Eratosthenes can be expressed in pseudocode, as follows:
@@ -392,6 +506,148 @@ class Solution:
     <b><a href="#algorithms">⬆️ Back to Top</a></b>
 </div>
 <br/>
+
+#### [LC-372:Super Pow](https://leetcode.com/problems/super-pow/)
+##### Solution-1 ( Euler's theorem ).
+##### The Math Behind the Solution
+```
+![equation](https://latex.codecogs.com/png.image?\dpi{200}%20a^{\Phi(n)}\equiv1)  `mod n`
+where, ![equation](https://latex.codecogs.com/png.image?\dpi{200}%20\Phi(n)), is Euler's totient function.
+
+Let exp denote the exponent extracted from input b
+
+Goal = (a ^ exp) mod 1337
+= a ^ ( exp mod φ(1337) ) mod 1337
+= a ^ ( exp mod 1140) mod 1337
+use the formula derived above to reduce computation loading and to have higher performance.
+
+Remark:
+
+φ( 1337 )
+= φ( 7 x 191 ) where 7 and 191 are prime factor of 1337's factor decomposition
+= φ( 7 ) x φ( 191 )
+= ( 7 - 1 ) x ( 191 - 1 )
+= 6 x 190
+=1140
+
+[Euler's totient function φ( n )](https://en.wikipedia.org/wiki/Euler's_totient_function) counts the positive integers up to a given integer n that are relatively prime to n
+```
+##### References
+```
+= Euler's Theorem/Fermat's Little Theorem
+  - Euler's theorem, [[https://en.wikipedia.org/wiki/Euler's_theorem](https://en.wikipedia.org/wiki/Euler's_theorem](https://en.wikipedia.org/wiki/Euler's_theorem](https://en.wikipedia.org/wiki/Euler's_theorem)\)
+  - Fermat's little theorem, [[https://en.wikipedia.org/wiki/Fermat's_little_theorem](https://en.wikipedia.org/wiki/Fermat's_little_theorem](https://en.wikipedia.org/wiki/Fermat's_little_theorem](https://en.wikipedia.org/wiki/Fermat's_little_theorem)\)
+  - Euler's totient function, [[https://en.wikipedia.org/wiki/Euler's_totient_function](https://en.wikipedia.org/wiki/Euler's_totient_function](https://en.wikipedia.org/wiki/Euler's_totient_function](https://en.wikipedia.org/wiki/Euler's_totient_function)\)
+  - Examples, http://mathonline.wikidot.com/examples-using-euler-s-theorem
+  - Three cases for reducing the power
+    + a is multiple of 1337, result is 0
+    + a is coprime of 1337, then a ^ b % 1337 = a ^ (b % phi(1337)) % 1337
+    + a has divisor of 7 or 191,
+  - phi(1337) = phi(7 * 191) = 6 * 190 = 1140
+  - a ^ b mod 1337 = a ^ x mod 7, where x = b mod 1140
+```
+##### Solution Explanation
+```
+Hint & Reference:
+
+1. First step is to extract exponent from input parameter b, either by string operation, or reduce with lambda.
+
+2. Second step is to compute power with speed up by Euler theorem.
+```
+##### Complexity Analysis
+```
+Time complexity O(n)
+Space complexity O(1)
+```
+```python
+#Implementation_#1
+#Extract exponent by string operation
+class Solution:
+    def superPow(self, a: int, b: List[int]) -> int:
+        
+        
+        if a % 1337 == 0:
+            return 0
+        
+        else:
+            # Euler theorem:
+            #
+            # ( a ^ phi(n) ) mod n = 1
+            #  
+            # => ( a ^ b ) mod n = ( a ^ ( b mod phi(n) ) ) mod n
+            
+            exponent = int( ''.join( map( str, b) ) )
+			
+			return pow( base = a, exp = exponent % 1140, mod = 1337 )
+			
+
+#Implementation_#2
+#Extract exponent by reduce with lambda
+from functools import reduce
+
+class Solution:
+    def superPow(self, a: int, b: List[int]) -> int:
+        
+        
+        if a % 1337 == 0:
+            return 0
+        
+        else:
+            # Euler theorem:
+            #
+            # ( a ^ phi(n) ) mod n = 1
+            #  
+            # => ( a ^ b ) mod n = ( a ^ ( b mod phi(n) ) ) mod n
+            
+            decimal = lambda x,y : 10*x+y
+            exponent = reduce( decimal, b )
+			
+            return pow( base = a, exp = exponent % 1140, mod = 1337 )
+```
+##### Solution-2 ( Modular Exponentiation ).
+##### Solution Explanation
+```
+i)   It's useful in the field of public-key cryptography, https://en.wikipedia.org/wiki/Modular_exponentiation
+ii)  c mod m = (a * b) mod m = [(a mod m) * (b mod m)] mod m
+iii) Starting from the front, we do the powMod the base with the corresponding digit
+iv)  Then, we need to remember to powMod the previous result with 10
+
+pow_mod is quite similar to ordinary pow except computing remainder instead of product. 
+Since b could be larger than 2^31 so superPow is added.
+Otherwise pow_mod(a, c) is enough with O(lgN), 
+where N is the value of c.
+Inside superPow, I only call pow_mod(a, 10) with O(1). So the overall time complexity is O(N), 
+where N is the length of b.
+```
+##### Complexity Analysis
+```
+TC: O(N)
+SC: O(1)
+```
+```python
+class Solution:
+    def superPow(self, a, b):
+		k = 1337
+        if not b:
+            return 1
+        
+        a = a % k
+        ans = pow(a, b[len(b) - 1]) % k
+        for i in range(len(b)-2, -1, -1):
+            a = self.pow_mod(a, 10)
+            ans = ans * pow(a, b[i]) % k
+        return ans
+    
+    def pow_mod(self, a, b):
+		k = 1337
+        ans = 1
+        while b > 0:
+            if b & 1 == 1:
+                ans = ans * a % k
+            a = a * a % k
+            b = b >> 1
+        return ans
+```
 
 #### [LC-509:Fibonacci Number](https://leetcode.com/problems/fibonacci-number/)
 ##### Solution-1 ( Using Binet's Formula or the Golden Ratio  ).
@@ -541,6 +797,98 @@ class Solution:
             start_mat = get_mat_mult(start_mat, start_mat) 
             n >>= 1
         return final_mat[0][0]
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-1390:Four Divisors](https://leetcode.com/problems/four-divisors/)
+
+##### Solution-1 ( Sieve of Eratosthenes ).
+##### Solution Explanation
+```
+Based on the property of prime number to count the divisors:
+
+n = p1 ^ (a1) * p2 ^ (a2) *... * pn ^ (an) ; (with p1,p2,..,pn is the prime)
+
+= > the total divisors of number S = (a1+1) * (a2 + 1) * .. *(an +1)
+
+***So if one number have 4 divisors we have 2 cases:
+
+case 1: S = (a1+1) = (3 + 1) = 4 -> N = p1^3
+
+case 2: S = (a1+1) * (a2 + 1) = 2 * 2 = 4 -> N = p1 ^ 1 * p2 ^ 1 ; (with p1,p2 is prime and p2!=p1 )
+```
+##### Complexity Analysis
+```
+Time  : O(N+K*log(log(K)))  where N = max(nums), K is len(primes) 
+Space : O(N+M+K^2)          where N = max(nums), M=len(nums), K is len(primes) 
+```
+```python
+class Solution:
+	def sieve(self, n):
+		mark = [True] * (n + 1)
+		mark[0] = False
+		mark[1] = False
+		for i in range(2, int(n **(0.5)) + 2):
+			for j in range(i*i, n + 1, i):
+				mark[j]  = False
+		return mark
+
+    def sumFourDivisors(self, nums: List[int]) -> int:		
+		mark = sieve(max(nums))
+		
+		def f(num, mark):
+			s = 1 + num
+			for i in range(2, int(num**(0.5))+1):
+				if(i ** 3 == num):                     # case 1 :  n = p1 ^ 3 
+					return s + i + num//i
+				if(num % i == 0):
+					s += i
+					num = num//i
+					if(mark[num] == True and num!=i):  # case 2 : n = p1 ^ 1 * p2 ^ 1 -> the "p2" must be prime and different with the "p1" 
+						return s + num
+					return 0
+			return 0
+```
+
+##### Solution-2 ( Recursion ).
+##### Solution Explanation
+```
+Need to check up to floor(sqrt(num)) = s (inclusive) only because 
+for any divisor d < s, there is another divisor num/d > s.
+
+E.g. 81 has divisors 1, 3, 9, 27, 81. sqrt(81) = 9 has divisors 1, 3, 9.
+81/1 = 81, 81/3 = 27, 81/9 = 9. So if we only check for divisors up to 9 
+and account for 81/divisor, we reduce time complexity by sqrt(num).
+```
+##### Complexity Analysis
+```
+Time  : O(N * sqrt(M)) where N = length of nums and M = nums[i] 
+Space : O(1) since the length of set will not be more than 4
+```
+```python
+from functools import cache
+from math import isqrt
+
+class Solution:
+    def sumFourDivisors(self, nums: List[int]) -> int:
+        #@lru_cache(None)
+		#Note that @cache was introduced in Python 3.9, and it's a shorthand for @lru_cache(maxsize=None)
+		@cache
+        def f(x):
+            s = set()
+			#for i in range(1, floor(sqrt(x)) + 1):
+            for i in range(1, isqrt(x)+1):
+                if not x % i:
+                    s.add(i)
+                    s.add(x//i)
+                    if len(s) > 4: break
+            return sum(s) if len(s) == 4 else 0
+        return sum(map(f, nums))
 ```
 
 <br/>
