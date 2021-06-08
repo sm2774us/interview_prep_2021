@@ -522,10 +522,10 @@ class Solution:
 #### [LC-372:Super Pow](https://leetcode.com/problems/super-pow/)
 ##### Solution-1 ( Euler's theorem ).
 ##### The Math Behind the Solution
+> ![equation](https://latex.codecogs.com/png.image?\dpi{150}%20a^{\Phi(n)}\equiv1)  `mod n`
+> where, ![equation](https://latex.codecogs.com/png.image?\dpi{150}%20\Phi(n)), is Euler's totient function.
+>
 ```
-![equation](https://latex.codecogs.com/png.image?\dpi{200}%20a^{\Phi(n)}\equiv1)  `mod n`
-where, ![equation](https://latex.codecogs.com/png.image?\dpi{200}%20\Phi(n)), is Euler's totient function.
-
 Let exp denote the exponent extracted from input b
 
 Goal = (a ^ exp) mod 1337
@@ -676,13 +676,13 @@ class Solution:
 * This formula was lost for about 100 years and was rediscovered by another mathematician named Jacques Binet.
 * The original formula, known as Binet’s formula, is shown below :
 * **Binet’s Formula**: The nth Fibonacci number is given by the following formula:
-![equation](https://latex.codecogs.com/png.image?\dpi{200}%20f_{n}=\frac{\left[\left(\frac{1+\sqrt{5}}{2}\right)^{n}-\left(\frac{1-\sqrt{5}}{2}\right)^{n}\right]}{\sqrt{5}})
+![equation](https://latex.codecogs.com/png.image?\dpi{150}%20f_{n}=\frac{\left[\left(\frac{1+\sqrt{5}}{2}\right)^{n}-\left(\frac{1-\sqrt{5}}{2}\right)^{n}\right]}{\sqrt{5}})
 
 * Another interesting fact arises when looking at the ratios of consecutive Fibonacci numbers.
 * It appears that these ratios are approaching a number.
 * The number that these ratios are getting closer to is a special number called the Golden Ratio which is denoted by  (the Greek letter phi). You have seen this number in Binet’s formula.
 * The Golden Ratio:
-![equation](https://latex.codecogs.com/png.image?\dpi{200}%20\frac{1+\sqrt{5}}{2})
+![equation](https://latex.codecogs.com/png.image?\dpi{150}%20\frac{1+\sqrt{5}}{2})
 * The Golden Ratio has the decimal approximation of ϕ =1.6180339887.
 
 ##### Complexity Analysis
