@@ -1,6 +1,8 @@
 # LeetCode Curated List of 75 Problems.
 
-## Math
+## Algorithms
+
+* [Math](#math)
 
 ## Array
 
