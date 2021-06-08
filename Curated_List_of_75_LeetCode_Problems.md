@@ -30,9 +30,12 @@
 
 
 ## Math
-| #     | Title	               | url                                                 | Time     | Space | Difficulty | Tag	      | Note                   |
-| ----- | -------------------- | --------------------------------------------------- | -------- | ----- | ---------- | ---------- | ---------------------- |
-| 0149  | Max Points on a Line | https://leetcode.com/problems/max-points-on-a-line/ | O(n^2)	| O(n)  | Hard       |            |                        |
+| #     | Title	               | url                                                 | Time                  | Space   | Difficulty | Tag	                              | Note                   |
+| ----- | -------------------- | --------------------------------------------------- | --------------------- | ------- | ---------- | ----------------------------------- | ---------------------- |
+| 0149  | Max Points on a Line | https://leetcode.com/problems/max-points-on-a-line/ | _O(n^2)_	             | _O(n)_  | Hard       |                                     | Linear Equation `ax + by + c = 0` |
+| 0204  | Count Primes         | https://leetcode.com/problems/count-primes/         | _O( N* Log(Log(N)) )_ | _O(N)_  | Easy       |                                     | Sieve of Eratosthenes  |
+| 0509  | Fibonacci Number     | https://leetcode.com/problems/fibonacci-number/     | _O(logn)_             | _O(1)_  | Easy       | variant of [Climbing Stairs](https://leetcode.com/problems/climbing-stairs/) | Matrix Exponentiation, Binet's Formula |
+#### [LC-149:Max Points on a Line](https://leetcode.com/problems/max-points-on-a-line/)
 ##### The Math Behind the Solution
 ```
 Q1> What is the equation of a line, in the form:
@@ -242,6 +245,302 @@ class Solution:
             sum(counter[p] for p in ps)
             for ps in lines.values()
         ))
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-204:Count Primes](https://leetcode.com/problems/count-primes/)
+##### The Math Behind the Solution
+```
+Reference: https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes
+
+In mathematics, the sieve of Eratosthenes is an ancient algorithm for finding all prime numbers up to any given limit.
+
+A prime number is a natural number that has exactly two distinct natural number divisors: the number 1 and itself.
+
+To find all the prime numbers less than or equal to a given integer n by Eratosthenes' method:
+
+  1. Create a list of consecutive integers from 2 through n: (2, 3, 4, ..., n).
+  2. Initially, let p equal 2, the smallest prime number.
+  3. Enumerate the multiples of p by counting in increments of p from 2p to n, and mark them in the list (these will be 2p, 3p, 4p, ...; the p itself should not be marked).
+  4. Find the smallest number in the list greater than p that is not marked. If there was no such number, stop. Otherwise, let p now equal this new number (which is the next prime), and repeat from step 3.
+  5. When the algorithm terminates, the numbers remaining not marked in the list are all the primes below n.
+  6. The main idea here is that every value given to p will be prime, because if it were composite it would be marked as a multiple of some other, smaller prime. Note that some of the numbers may be marked more than once (e.g., 15 will be marked both for 3 and 5).
+
+As a refinement, it is sufficient to mark the numbers in step 3 starting from p2, as all the smaller multiples of p will have already been marked at that point. This means that the algorithm is allowed to terminate in step 4 when p2 is greater than n.[1]
+
+Another refinement is to initially list odd numbers only, (3, 5, ..., n), and count in increments of 2p from p2 in step 3, thus marking only odd multiples of p. This actually appears in the original algorithm.[1] This can be generalized with wheel factorization, forming the initial list only from numbers coprime with the first few primes and not just from odds (i.e., numbers coprime with 2), and counting in the correspondingly adjusted increments so that only such multiples of p are generated that are coprime with those small primes, in the first place.[6]
+-------------------------
+Example
+To find all the prime numbers less than or equal to 30, proceed as follows.
+
+First, generate a list of integers from 2 to 30:
+```
+> 2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
+```
+The first number in the list is 2; cross out every 2nd number in the list after 2 by counting up from 2 in increments of 2 (these will be all the multiples of 2 in the list):
+```
+> 2  3  ~~4~~  5  ~~6~~  7  ~~8~~  9  ~~10~~ 11 ~~12~~ 13 ~~14~~ 15 ~~16~~ 17 ~~18~~ 19 ~~20~~ 21 ~~22~~ 23 ~~24~~ 25 ~~26~~ 27 ~~28~~ 29 ~~30~~
+```
+The next number in the list after 2 is 3; cross out every 3rd number in the list after 3 by counting up from 3 in increments of 3 (these will be all the multiples of 3 in the list):
+```
+> 2  3  ~~4~~  5  ~~6~~  7  ~~8  9  10~~ 11 ~~12~~ 13 ~~14 15 16~~ 17 ~~18~~ 19 ~~20 21 22~~ 23 ~~24~~ 25 ~~26 27 28~~ 29 ~~30~~
+```
+The next number not yet crossed out in the list after 3 is 5; cross out every 5th number in the list after 5 by counting up from 5 in increments of 5 (i.e. all the multiples of 5):
+```
+> 2  3  ~~4~~  5  ~~6~~  7  ~~8  9  10~~ 11 ~~12~~ 13 ~~14 15 16~~ 17 ~~18~~ 19 ~~20 21 22~~ 23 ~~24 25 26 27 28~~ 29 ~~30~~
+```
+The next number not yet crossed out in the list after 5 is 7; the next step would be to cross out every 7th number in the list after 7, but they are all already crossed out at this point, as these numbers (14, 21, 28) are also multiples of smaller primes because 7 × 7 is greater than 30. The numbers not crossed out at this point in the list are all the prime numbers below 30:
+```
+> 2  3     5     7           11    13          17    19          23                29
+```
+-------------------------
+Algorithm
+-------------------------
+Pseudocode
+-------------------------
+The sieve of Eratosthenes can be expressed in pseudocode, as follows:
+```
+> algorithm Sieve of Eratosthenes is
+>     input: an integer n > 1.
+>     output: all prime numbers from 2 through n.
+> 
+>     let A be an array of Boolean values, indexed by integers 2 to n,
+>     initially all set to true.
+>     
+>     for i = 2, 3, 4, ..., not exceeding √n do
+>         if A[i] is true
+>             for j = i2, i2+i, i2+2i, i2+3i, ..., not exceeding n do
+>                 A[j] := false
+> 
+>     return all i such that A[i] is true.
+> 
+```
+This algorithm produces all primes not greater than n. It includes a common optimization, which is to start enumerating t
+he multiples of each prime i from i^2. The time complexity of this algorithm is O( N* Log(Log(N)) ),
+provided the array update is an O(1) operation, as is usually the case.
+```
+
+##### Solution Explanation
+```
+Algorithm:
+-------------------------------
+  1. Create a list of consecutive integers from 2 through n: (2, 3, 4, ..., n).
+  2. Initially, let p equal 2, the smallest prime number.
+  3. Enumerate the multiples of p by counting in increments of p from 2p to n, and mark them in the list (these will be 2p, 3p, 4p, ...; the p itself should not be marked).
+  4. Find the smallest number in the list greater than p that is not marked. If there was no such number, stop. Otherwise, let p now equal this new number (which is the next prime), and repeat from step 3.
+  5. When the algorithm terminates, the numbers remaining not marked in the list are all the primes below n.
+  6. The main idea here is that every value given to p will be prime, because if it were composite it would be marked as a multiple of some other, smaller prime. Note that some of the numbers may be marked more than once (e.g., 15 will be marked both for 3 and 5).
+
+Make your code faster:
+-------------------------------
+  * The code line:
+    
+	lst[m * m: n: m] = [0] *((n-m*m-1)//m + 1) 
+	
+	is key to reduce the run time.
+	You could write a loop like this (but it would be very expensive):
+	
+    for i in range(m * m, n,  m):
+        lst[i] = 0
+
+  * After marking all the even indices in the first iteration, I do not check even numbers again, 
+    and will only check odd numbers in the remaining iterations.
+
+  * I created a list with numeral elements, instead of boolean elements.
+  
+  * Do not use function sqrt, because it is expensive [do not use: m < sqrt(n)].
+    Instead, use: m * m < n.
+```
+
+##### Complexity Analysis
+```
+TC: O( N* Log(Log(N)) )
+
+The time complexity is O(n/2 + n/3 + n/5 + n/7 + n/11 + ....) which is equivalent to O( N* Log(Log(N)) ).
+
+SC: O(N)
+```
+
+```python
+class Solution:
+    def countPrimes(self, n: int) -> int:
+        if n < 3: return 0     ###// No prime number less than 2
+        lst = [1] * n          ###// create a list for marking numbers less than n
+        lst[0] = lst[1] = 0    ###// 0 and 1 are not prime numbers
+        m = 2
+        while m * m < n:       ###// we only check a number (m) if its square is less than n
+            if lst[m] == 1:    ###// if m is already marked by 0, no need to check its multiples.
+			
+			    ###// If m is marked by 1, we mark all its multiples from m * m to n by 0. 
+			    ###// 1 + (n - m * m - 1) // m is equal to the number of multiples of m from m * m to n
+                lst[m * m: n: m] = [0] *(1 + (n - m * m - 1) // m)
+				
+			###// If it is the first iteration (e.g. m = 2), add 1 to m (e.g. m = m + 1; 
+			### // which means m will be 3 in the next iteration), 
+            ###// otherwise: (m = m + 2); This way we avoid checking even numbers again.	
+            m += 1 if m == 2 else 2
+        return sum(lst)
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-509:Fibonacci Number](https://leetcode.com/problems/fibonacci-number/)
+##### Solution-1 ( Using Binet's Formula or the Golden Ratio  ).
+
+##### The Math Behind the Solution
+* Calculating terms of the Fibonacci sequence can be tedious when using the recursive formula, especially when finding terms with a large n. 
+* Luckily, a mathematician named Leonhard Euler discovered a formula for calculating any Fibonacci number.
+* This formula was lost for about 100 years and was rediscovered by another mathematician named Jacques Binet.
+* The original formula, known as Binet’s formula, is shown below :
+* **Binet’s Formula**: The nth Fibonacci number is given by the following formula:
+![equation](https://latex.codecogs.com/png.image?\dpi{200}%20f_{n}=\frac{\left[\left(\frac{1+\sqrt{5}}{2}\right)^{n}-\left(\frac{1-\sqrt{5}}{2}\right)^{n}\right]}{\sqrt{5}})
+
+* Another interesting fact arises when looking at the ratios of consecutive Fibonacci numbers.
+* It appears that these ratios are approaching a number.
+* The number that these ratios are getting closer to is a special number called the Golden Ratio which is denoted by  (the Greek letter phi). You have seen this number in Binet’s formula.
+* The Golden Ratio:
+![equation](https://latex.codecogs.com/png.image?\dpi{200}%20\frac{1+\sqrt{5}}{2})
+* The Golden Ratio has the decimal approximation of ϕ =1.6180339887.
+
+##### Complexity Analysis
+```
+TC: O(1)
+SC: O(1)
+```
+
+```python
+# Reference: https://math.libretexts.org/Bookshelves/Applied_Mathematics/Book%3A_College_Mathematics_for_Everyday_Life_(Inigo_et_al)/10%3A_Geometric_Symmetry_and_the_Golden_Ratio/10.04%3A_Fibonacci_Numbers_and_the_Golden_Ratio#:~:text=The%20number%20that%20these%20ratios,this%20number%20in%20Binet%27s%20formula.&text=The%20Golden%20Ratio%20has%20the,for%20a%20variety%20of%20reasons.
+class Solution:
+    def fib(self, N: int) -> int:
+        phi = round((1 + 5 ** 0.5) / 2, 6)
+        return round((phi ** N - (-phi) ** (-N)) / (5 ** 0.5))
+```
+
+##### Solution-2 ( Using Tail Recursion  ).
+
+##### Complexity Analysis
+```
+TC: O(N)
+SC: O(1)
+```
+
+```python
+class Solution:
+    def fib(self, n: int) -> int:
+        def fib_helper(n: int, a: int =0, b: int =1) -> int:
+            # tail recursion
+            # ie. input = 5
+            # 4, 1, 1
+            # 3, 1, 2
+            # 2, 2, 3
+            # 1, 3, 5
+            if n == 0:
+                return a
+            elif n == 1:
+                return b
+            else:
+                return fib_helper(n-1, b, a+b)
+        
+        return fib_helper(n)
+```
+
+##### Solution-3 ( Using Matrix Exponentiation - DP ).
+
+##### Solution Explanation
+```
+Usually if any problem is solvable in constant space using iterative dp,
+then we can apply matrix exponentiation and convert an O(n) problem to O(logn)
+
+We will try to create a matrix out of the recursive relations we know:
+
+Relation 1:      fib(n)   =   1*fib(n-1) +  1*fib(n-2)
+Relation 2:      fib(n-1) =   1*fib(n-1) +  0*fib(n-2)
+
+Matrix M:  [1,1]
+           [1,0]
+				  
+|fib (n) | =   |1 1| |fib(n-1)|
+|fib(n-1)|     |1 0| |fib(n-2)|
+
+or 
+
+|fib (n) |  =  |1 1| |1 1||fib(n-2)|
+|fib(n-1)|     |1 0| |1 0||fib(n-3)|
+
+or
+
+|fib (n) |  =  |1 1| |1 1| |1 1||fib(n-3)|
+|fib(n-1)|     |1 0| |1 0| |1 0||fib(n-4)|
+
+or
+
+|fib (n) |  =  |1 1| ^ (n-2) |fib(2)|
+|fib(n-1)|     |1 0|         |fib(1)|
+---------------------------------------------------------------------
+Intuition
+---------------------------------------------------------------------
+The core idea behind this is to evaluate the equation F[n] = F[n-1] + F[n-2] 
+and represent this as somehow a power of a matrix. 
+We know that a^n can be calculated in O(log n) time using binary exponentiation.
+If we can somehow represent the above recurrence relation as a power of matrix and the base values (F[1], F[0]),
+then we can get the F[n] in O(log n) time.
+---------------------------------------------------------------------
+Algorithm
+---------------------------------------------------------------------
+So consider this :- [F[n], F[n-1]] = [[1,1], [1,0]] * [F[n-1], F[n-2]].
+So what I have done is just make the matrix on the right side a 2 X 1 matrix 
+so that it can be represented in the terms of this matrix [[1,1],[1,0]]. 
+This is done because if you see the left side, then you can put 
+[F[n-1], F[n-2]] = [[1,1],[1,0]] * [F[n-2],F[n-3]]. 
+
+So you if you keep doing this then the above recurrence relation boils down to
+[F[n], F[n-1]] = [[1,1], [1,0]] ^ (n-1) * [F[1], F[0]].
+
+So what we have to do is calculate the (n-1)th power of the matrix [[1,1],[1,0]]. 
+So we can calculate that just like we calculate the a^n in O(log n) time using binary exponentiation.
+Just that a would be the matrix [[1,1],[1,0]] instead of an integer.
+Following is the code for this :-
+```
+
+##### Complexity Analysis
+```
+TC: O(log(N))
+SC: O(1)
+```
+
+```python
+class Solution:
+    def fib(self, n: int) -> int:
+        
+        def get_mat_mult(mat, other_mat):
+            res = [[0 for _ in range(len(mat[0]))] for _ in range(len(mat))]
+            for i in range(len(mat)):
+                for j in range(len(mat[i])):
+                    for k in range(len(other_mat[i])):
+                        res[i][j] += mat[i][k] * other_mat[k][j]
+            return res
+        
+        if n == 0 or n == 1:
+            return n
+        
+        final_mat = [[1,0],[0,1]]
+        start_mat = [[1,1], [1,0]]
+        n -= 1
+        while(n):
+            if (n & 1):
+                final_mat = get_mat_mult(start_mat, final_mat)
+            start_mat = get_mat_mult(start_mat, start_mat) 
+            n >>= 1
+        return final_mat[0][0]
 ```
 
 <br/>
