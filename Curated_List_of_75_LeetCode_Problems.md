@@ -3023,10 +3023,1503 @@ fun main(args: Array<String>) {
 </div>
 <br/>
 
+## Dynamic Programming
+| #     | Title	                                              | url                                                                           | Time       | Space   | Difficulty | Tag	         | Note                       |
+| ----- | --------------------------------------------------- | ----------------------------------------------------------------------------- | ---------- | ------- | ---------- | ------------ | -------------------------- |
+| 0070  | [Climbing Stairs](#lc-70climbing-stairs)            | https://leetcode.com/problems/climbing-stairs/                                | _O(logn)_  | _O(1)_  | Easy       |              | DP and Fibonacci Sequence  |
+| 0322  | [Coin Change](#lc-322coin-change)                   | https://leetcode.com/problems/coin-change/                                    | _O(n * k)_ | _O(k)_  | Medium     |              |                            |
+| 0300  | [Longest Increasing Subsequence (LIS)](#lc-300longest-increasing-subsequence) | https://leetcode.com/problems/longest-increasing-subsequence/                 | _O(nlogn)_ | _O(n)_  | Medium     | CTCI, LintCode | Patience Sorting using Binary Search, DP |
+| 1143  | [Longest Common Subsequence (LCS)](#lc-1143longest-common-subsequence) | https://leetcode.com/problems/longest-common-subsequence/                     | _O(m * n)_ | _O(min(m, n))_ | Medium |           |                            |
+| 0139  | [Word Break](#lc-139word-break)                     | https://leetcode.com/problems/word-break/                                     | _O(n * l^2)_ | _O(n)_ | Medium    |              |                            |
+| 0377  | [Combination Sum IV](#lc-377combination-sum-iv)     | https://leetcode.com/problems/combination-sum-iv/                             | _O(nlogn + n * t)_ | _O(t)_ | Medium |           |                            |
+| 0198  | [House Robber](#lc-198house-robber)                 | https://leetcode.com/problems/house-robber/                                   | _O(n)_     | _O(1)_  | Easy       |              |                            |
+| 0213  | [House Robber II](#lc-213house-robber-ii)           | https://leetcode.com/problems/house-robber-ii/                                | _O(n)_     | _O(1)_  | Medium     |              |                            |
+| 0091  | [Decode Ways](#lc-91decode-ways)                    | https://leetcode.com/problems/decode-ways/                                    | _O(n)_     | _O(1)_  | Medium     |              |                            |
+| 0062  | [Unique Paths](#lc-62unique-paths)                  | https://leetcode.com/problems/unique-paths/                                   | _O(m * n)_ | _O(m + n)_ | Medium  |              |                            |
+| 0055  | [Jump Game](#lc-55jump-game)                        | https://leetcode.com/problems/jump-game/                                      | _O(n)_     | _O(1)_  | Medium     |              |                            |
+
+#### [LC-70:Climbing Stairs](https://leetcode.com/problems/climbing-stairs/)
+##### Solution Explanation:
+```
+Intuition
+---------
+Solution to this problem makes a Fibonacci sequence. We can understand it better if we start from the end. 
+To reach to Step N, you can either reach to step N-1 and take 1 step from there or take 2 step from N - 2.
+Therefore it can be summarized as:
+F(N) = F(N-1) + F(N-2)
+
+Once you have recognized the pattern, it is very easy to write the code:
+---------
+
+Solution Approach:
+DP and Fibonacci Sequence
+=================================================================================================================================================================
+To reach a specific stair x, we can either climb 1 stair from x-1, or 2 stairs from x-2. 
+Therefore, suppose dp[i] records the number of ways to reach stair i, dp[i] = dp[i-1]+dp[i-2]. 
+And it's a Fibonacci Array.
+The base case is to reach the first stair, we only have one way to do it so dp[1] = 1.
+
+Besides, since only dp elements we used is most recent two elements, we can use two pointers to save using of dp array. 
+So space complexity is O(1).
+```
+##### Complexity Analysis:
+```
+Time  : O(N)
+Space : O(1)
+```
+```python
+def climbStairs(n: int) -> int:
+    prev, curr = 0, 1
+    for _ in range(n):
+        curr = prev + curr
+        prev = curr
+    return curr
+
+if __name__ == "__main__":
+    #Input: n = 2
+    #Output: 2
+    #Explanation: There are two ways to climb to the top.
+    #1. 1 step + 1 step
+    #2. 2 steps
+    n = 2
+    print(climbStairs(n))
+```
+```kotlin
+fun climbStairs(n: Int): Int {
+    var prev = 0
+    var curr = 1
+    for (i in 0 until n) {
+        curr = prev + curr
+        prev = curr
+    }
+    return curr        
+}
+
+fun main(args: Array<String>) {
+    //Input: n = 2
+    //Output: 2
+    //Explanation: There are two ways to climb to the top.
+    //1. 1 step + 1 step
+    //2. 2 steps
+    val n = 2
+    println(climbStairs(n))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-322:Coin Change](https://leetcode.com/problems/coin-change/)
+##### Solution Explanation:
+```
+Solution Approach:
+DP
+=================================================================================================================================================================
+
+Assume dp[i] is the fewest number of coins making up amount i, then for every coin in coins, dp[i] = min(dp[i - coin] + 1).
+
+The time complexity is O(amount * coins.length) and the space complexity is O(amount).
+```
+##### Complexity Analysis:
+```
+TIME COMPLEXITY : O(amount * coins.length)
+SPACE COMPLEXITY : O(amount)
+```
+```python
+from typing import List
+
+def coinChange(coins: List[int], amount: int) -> int:
+    dp = [float('Inf')]*(amount+1)
+    dp[0] = 0
+    for i in range(1, amount+1):
+        for coin in coins:
+            if i - coin >= 0:
+                dp[i] = min(dp[i], dp[i-coin] + 1)
+    return dp[amount] if dp[amount] != float('Inf') else -1
+
+if __name__ == "__main__":
+    #Input: coins = [1,2,5], amount = 11
+    #Output: 3
+    #Explanation: 11 = 5 + 5 + 1
+    coins = [1,2,5]
+    amount = 11
+    print(coinChange(coins, amount))
+```
+```kotlin
+fun coinChange(coins: IntArray, amount: Int): Int {
+    val dp = IntArray(amount+1)
+    for (i in 1 until amount+1) {
+        dp[i] = Int.MAX_VALUE
+        for (coin in coins) {
+            if (i - coin >= 0 && dp[i - coin] != Int.MAX_VALUE) {
+                dp[i] = minOf(dp[i], dp[i - coin] + 1)
+            }
+        }
+    }
+    return if (dp[amount] == Int.MAX_VALUE) -1 else dp[amount]
+}
+
+fun main(args: Array<String>) {
+    //Input: coins = [1,2,5], amount = 11
+    //Output: 3
+    //Explanation: 11 = 5 + 5 + 1
+    val coins = intArrayOf(1,2,5)
+    val amount = 11
+    println(coinChange(coins, amount))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-300:Longest Increasing Subsequence](https://leetcode.com/problems/longest-increasing-subsequence/)
+##### Solution Explanation:
+```
+=================================================================================================================================================================
+Approach 1: Patience Sorting using Binary Search
+=================================================================================================================================================================
+This algorithm is actually Patience sorting. 
+It might be easier for you to understand how it works if you think about it as piles of cards instead of tails.
+The number of piles is the length of the longest subsequence.
+For more info see Princeton lecture.
+
+1) Initially, there are no piles. The first card dealt forms a new pile consisting of the single card.
+2) Each subsequent card is placed on the leftmost existing pile whose top card has a value greater 
+   than or equal to the new card's value, or to the right of all of the existing piles, thus forming a new pile.
+3) When there are no more cards remaining to deal, the game ends.
+
+Detailed Algorithm:
+-----------------------
+piles is an array storing the smallest tail of all increasing subsequences with length i+1 in piles[i].
+For example, say we have nums = [4,5,6,3], then all the available increasing subsequences are:
+
+len = 1   :      [4], [5], [6], [3]   => piles[0] = 3
+len = 2   :      [4, 5], [5, 6]       => piles[1] = 5
+len = 3   :      [4, 5, 6]            => piles[2] = 6
+We can easily prove that piles is a increasing array. Therefore it is possible to do a binary search in piles array to find the one needs update.
+
+Each time we only do one of the two:
+
+(1) if num is larger than all piles, append it, increase the size by 1
+(2) if piles[i-1] < num <= piles[i], update piles[i]
+(3) Doing so will maintain the piles invariant. The the final answer is just the size.
+
+
+-----------------------
+References:
+https://en.wikipedia.org/wiki/Patience_sorting
+Priceton Lecture on LIS: https://www.cs.princeton.edu/courses/archive/spring13/cos423/lectures/LongestIncreasingSubsequence.pdf
+
+=================================================================================================================================================================
+Approach 2: DP
+=================================================================================================================================================================
+1) Check the base case, if nums has size less than or equal to 1, then return length of nums
+2) Create a 'dp' array of size nums.length to track the longest sequence length
+3) Fill each position with value 1 in the array
+4) Mark one pointer at i. For each i, start from j=0.
+   4.1.1) If, nums[j] < nums[i], it means next number contributes to increasing sequence. 
+      4.1.1.1) But increase the value only if it results in a larger value of the sequence than dp[i].
+               It is possible that dp[i] already has larger value from some previous j'th iteration.
+5) Find the maximum length from the array that we just generated.
+
+-----------------------
+References:
+https://www.youtube.com/watch?v=CE2b_-XfVDk
+```
+##### Interview Tips:
+```
+NOTES: In an Interview Situation - Choose Approach 1 ( Patience Sorting using Binary Search ) over Approach 2 ( DP ),
+       since it is an O(N*log(N)) TC [ DP is worse off at O(N^2) ].
+```
+##### Complexity Analysis:
+```
+=================================================================================================================================================================
+Approach 1: Patience Sorting using Binary Search
+=================================================================================================================================================================
+TIME COMPLEXITY : O(N*log(N))
+SPACE COMPLEXITY : O(N)
+=================================================================================================================================================================
+Approach 2: DP
+=================================================================================================================================================================
+TIME COMPLEXITY : O(N^2)
+SPACE COMPLEXITY : O(N)
+```
+```python
+#=================================================================================================================================================================
+#Approach 1 ( Patience Sorting using Binary Search ) ... answer for the Follow-Up question
+#TC: O(N*log(N))
+#SC: O(N)
+#=================================================================================================================================================================
+from typing import List
+
+def binary_search(nums: List[int], target: int) -> int:
+    lo, hi = 0, len(nums)
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if nums[mid] < target:
+            lo = mid + 1
+        else:
+            hi = mid
+    return lo
+
+def lengthOfLIS(nums: List[int]) -> int:
+    piles = []
+    for num in nums:
+        if not piles or num > piles[-1]:
+            piles.append(num)
+        else:
+            pos = binary_search(piles, num)
+            piles[pos] = num
+    return len(piles)
+
+def lengthOfLIS(nums: List[int]) -> int:
+    if len(nums) == 0:
+        return 0
+    piles = [0] * len(nums)
+    longest = 0
+    for num in nums:
+        i, j = 0, longest
+        while i != j:
+            m = (i + j) // 2
+            if piles[m] < x:
+                i = m + 1
+            else:
+                j = m
+        piles[i] = x
+        longest = max(i + 1, longest)
+    return longest
+
+if __name__ == "__main__":
+    #Input: nums = [10,9,2,5,3,7,101,18]
+    #Output: 4
+    #Explanation: The longest increasing subsequence is [2,3,7,101], therefore the length is 4.
+    nums = [10,9,2,5,3,7,101,18]
+    print(lengthOfLIS(nums))
+	
+#=================================================================================================================================================================
+#Approach 2 ( DP )
+#TC: O(N^2)
+#SC: O(N)
+#=================================================================================================================================================================
+from typing import List
+
+def lengthOfLIS(nums: List[int]) -> int:
+    if len(nums) == 0:
+        return 0
+    nums_length = len(nums)
+    dp = [1] * nums_length
+    longest = 1
+    for i in range(nums_length):
+        for j in range(i):
+            if nums[i] < nums[j]:
+                dp[i] = max(dp[i], dp[j]+1)
+        longest = max(longest, dp[i])
+    return longest
+
+if __name__ == "__main__":
+    #Input: nums = [10,9,2,5,3,7,101,18]
+    #Output: 4
+    #Explanation: The longest increasing subsequence is [2,3,7,101], therefore the length is 4.
+    nums = [10,9,2,5,3,7,101,18]
+    print(lengthOfLIS(nums))
+```
+```kotlin
+//=================================================================================================================================================================
+//Approach 1 ( Patience Sorting using Binary Search ) ... answer for the Follow-Up question
+//TC: O(N*log(N))
+//SC: O(N)
+//=================================================================================================================================================================
+fun binarySearch(nums: IntArray, target: Int): Int {
+    var lo = 0
+    var hi = nums.size
+    while (lo < hi) {
+        val mid = (lo + hi) / 2
+        if (nums[mid] < target) {
+            lo = mid + 1
+        } else {
+            hi = mid
+        }
+    }
+    return lo
+}
+
+fun lengthOfLIS(nums: IntArray): Int {
+    // sanity check
+    if (nums.isEmpty()) return 0
+
+    var piles: MutableList<Int> = mutableListOf()
+    for (num in nums) {
+        if ( num > piles?.lastOrNull() ?: -1 ) {
+            piles.add(num)
+        } else {
+            val pos = binarySearch(piles.toIntArray(), num)
+            piles[pos] = num
+        }
+    }
+    return piles.size
+}
+
+fun lengthOfLIS(nums: IntArray): Int {
+    // sanity check
+    if (nums.isEmpty()) return 0
+    val piles = IntArray(nums.size)
+    var longest = 0
+    for (x in nums) {
+        var i = 0
+        var j = longest
+        while (i != j) {
+            var m = (i + j) / 2
+            if (piles[m] < x) {
+                i = m + 1
+            } else {
+                j = m
+            }
+        }
+        piles[i] = x
+        if (i == longest) ++longest
+    }
+    return longest
+}
+
+fun main(args: Array<String>) {
+    //Input: nums = [10,9,2,5,3,7,101,18]
+    //Output: 4
+    //Explanation: The longest increasing subsequence is [2,3,7,101], therefore the length is 4.
+    val nums = intArrayOf(10,9,2,5,3,7,101,18)
+    println(lengthOfLIS(nums))
+}
+
+//=================================================================================================================================================================
+//Approach 2 ( DP )
+//TC: O(N^2)
+//SC: O(N)
+//=================================================================================================================================================================
+fun lengthOfLIS(nums: IntArray): Int {
+    // sanity check
+    if (nums.isEmpty()) return 0
+
+    val nums_length = nums.size
+
+    val dp = IntArray(nums_length) { 1 }
+    var longest = 1
+
+    for (i in 0 until nums_length) {
+        for (j in 0 until i) {
+            if (nums[i] > nums[j]) {
+                dp[i] = maxOf(dp[i], dp[j] + 1)
+            }
+        }
+        longest = maxOf(longest, dp[i])
+    }
+    return longest
+}
+
+fun main(args: Array<String>) {
+    //Input: nums = [10,9,2,5,3,7,101,18]
+    //Output: 4
+    //Explanation: The longest increasing subsequence is [2,3,7,101], therefore the length is 4.
+    val nums = intArrayOf(10,9,2,5,3,7,101,18)
+    println(lengthOfLIS(nums))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-1143:Longest Common Subsequence](https://leetcode.com/problems/longest-common-subsequence/)
+##### Solution Explanation:
+```
+Solution Approach:
+=================================================================================================================================================================
+DP with Memoization and 1D array for "Space Optimization"
+-----------------------------------------------------------
+
+Find LCS;
+Let X be “XMJYAUZ” and Y be “MZJAWXU”. The longest common subsequence between X and Y is “MJAU”. 
+The following table shows the lengths of the longest common subsequences between prefixes of X and Y.
+The ith row and jth column shows the length of the LCS between X_{1..i} and Y_{1..j}.
+
++-------+---+---+---+---+---+---+---+---+
+|       | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+|       +---+---+---+---+---+---+---+---+
+|       | 0 | M | Z | J | A | W | X | U |
++---+---+---+---+---+---+---+---+---+---+
+| 0 | 0 |*0*| 0 | 0 | 0 | 0 | 0 | 0 | 0 |
++---+---+---+---+---+---+---+---+---+---+
+| 1 | X | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 1 |
++---+---+---+---+---+---+---+---+---+---+
+| 2 | M | 0 |*1*| 1 | 1 | 1 | 1 | 1 | 1 |
++---+---+---+---+---+---+---+---+---+---+
+| 3 | J | 0 | 1 | 1 |*2*| 2 | 2 | 2 | 2 |
++---+---+---+---+---+---+---+---+---+---+
+| 4 | Y | 0 | 1 | 1 | 2 | 2 | 2 | 2 | 2 |
++---+---+---+---+---+---+---+---+---+---+
+| 5 | A | 0 | 1 | 1 | 2 |*3*| 3 | 3 | 3 |
++---+---+---+---+---+---+---+---+---+---+
+| 6 | U | 0 | 1 | 1 | 2 | 3 | 3 | 3 |*4*|
++---+---+---+---+---+---+---+---+---+---+
+| 7 | Z | 0 | 1 | 2 | 2 | 3 | 3 | 3 | 4 |
++---+---+---+---+---+---+---+---+---+---+
+
+References:
+-----------------
+https://en.m.wikipedia.org/wiki/Longest_common_subsequence_problem
+https://www.ics.uci.edu/~eppstein/161/960229.html
+```
+##### Complexity Analysis:
+```
+TIME COMPLEXITY : O(M*N)
+SPACE COMPLEXITY : O(MIN(M,N))
+
+where:
+------
+M = length of string text1
+N = length of string text2
+```
+```python
+#Q & A:
+#---------------
+#Q1: What is the difference between [[0] * m * n] and [[0] * m for _ in range(n)]? 
+#    Why does the former update all the rows of that column when I try to update one particular cell ?
+#A1: [[0] * m * n] creates n references to the exactly same list objet: [0] * m; 
+#    In contrast: [[0] * m for _ in range(n)] creates n different list objects that have same value of [0] * m.
+#
+def longestCommonSubsequence(text1: str, text2: str) -> int:
+    m, n = map(len, (text1, text2))
+    if m < n:
+        return self.longestCommonSubsequence(text2, text1)
+    dp = [0] * (n + 1)
+    for c in text1:
+        prevRow, prevRowPrevCol = 0, 0
+        for j, d in enumerate(text2):
+            prevRow, prevRowPrevCol = dp[j + 1], prevRow
+            dp[j + 1] = prevRowPrevCol + 1 if c == d else max(dp[j], prevRow)
+    return dp[-1]
+
+if __name__ == "__main__":
+    #Input: text1 = "abcde", text2 = "ace" 
+    #Output: 3  
+    #Explanation: The longest common subsequence is "ace" and its length is 3.
+    text1 = "abcde"
+    text2 = "ace"
+    print(longestCommonSubsequence(text1,text2))
+```
+```kotlin
+fun longestCommonSubsequence(text1: String, text2: String): Int {
+    val m = text1.length
+    val n = text2.length
+    if (m < n) {
+        return longestCommonSubsequence(text2, text1);
+    }
+    val dp = IntArray(n+1)
+    for (c in text1) {
+        var prevRow = 0
+        var prevRowPrevCol = 0
+        for ((j, d) in text2.withIndex()) {
+            prevRow = dp[j + 1]
+            prevRowPrevCol = prevRow
+            dp[j + 1] = if (c.equals(d)) prevRowPrevCol + 1 else maxOf(dp[j], prevRow)
+        }
+    }
+    return dp.last()
+}
+
+fun main(args: Array<String>) {
+    //Input: text1 = "abcde", text2 = "ace" 
+    //Output: 3  
+    //Explanation: The longest common subsequence is "ace" and its length is 3.
+    val text1 = "abcde"
+    val text2 = "ace"
+    println(longestCommonSubsequence(text1,text2))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-139:Word Break](https://leetcode.com/problems/word-break/)
+##### Solution Explanation:
+```
+Solution Approach:
+DP
+=================================================================================================================================================================
+(1) dp[hi] = s[0:hi] is segmentable ( or breakable ).
+(2) Considering all possible substrings of s.
+(3) If s[0:lo] is segmentable and s[lo:hi] is segmentable, then s[0:hi] is segmentable. Equivalently, if dp[lo] is True and s[lo:hi] is in the wordDict, then dp[hi] is True.
+(4) Our goal is to determine if dp[hi] is segmentable, and once we do, we don't need to consider anything else. This is because we want to construct dp.
+(5) dp[len(s)] tells us if s[0:len(s)] (or equivalently, s) is segmentable.
+```
+##### Complexity Analysis:
+```
+TIME COMPLEXITY  : O(N*L) [ O(N*L*N) or O(L*N^2) is substr is considered ]. 
+SPACE COMPLEXITY : O(N)
+
+where:
+------
+L = size of wordDict
+N = length of string s
+```
+```python
+#(1) dp[i] = s[0:i] is breakable
+#(2) Considering all possible substrings of s.
+#(3) If s[0:j] is breakable and s[j:i] is breakable, then s[0:i] is breakable.
+#    Equivalently, if dp[j] is True and s[j:i] is in the wordDict, then dp[i] is True.
+#(4) Our goal is to determine if dp[i] is breakable, and once we do, we don't need to consider anything else. This is because we want to construct dp.
+#(5) dp[len(s)] tells us if s[0:len(s)] (or equivalently, s) is breakable.
+def wordBreak(s: str, wordDict: List[str]) -> bool:
+    if not s: return False
+    dp = [False for i in range(len(s) + 1)] #(1)
+    dp[0] = True
+    
+    for hi in range(len(s) + 1): #(2)
+        for lo in range(hi):
+            if dp[lo] and s[lo:hi] in wordDict: #(3)
+                dp[hi] = True
+                break #(4)
+        
+    return dp[len(s)] #(5)
+
+if __name__ == "__main__":
+    #Input: s = "leetcode", wordDict = ["leet","code"]
+    #Output: true
+    #Explanation: Return true because "leetcode" can be segmented as "leet code".
+    s = "leetcode"
+    wordDict = ["leet","code"]
+    print(wordBreak(s, wordDict))
+```
+```kotlin
+//(1) dp[i] = s[0:i] is breakable
+//(2) Considering all possible substrings of s.
+//(3) If s[0:j] is breakable and s[j:i] is breakable, then s[0:i] is breakable.
+//     Equivalently, if dp[j] is True and s[j:i] is in the wordDict, then dp[i] is True.
+//(4) Our goal is to determine if dp[i] is breakable, and once we do, we don't need to consider anything else. This is because we want to construct dp.
+//(5) dp[len(s)] tells us if s[0:len(s)] (or equivalently, s) is breakable.
+fun wordBreak(s: String, wordDict: List<String>): Boolean {
+    // sanity check
+    if(s.isEmpty()) return false
+
+    val len = s.length
+    val wordSet = HashSet(wordDict)
+
+    val dp = BooleanArray(len + 1) //(1)
+    dp[0] = true
+
+    for (hi in 1..len) { //(2)
+        for (lo in 0..hi) {
+            if (dp[lo] && wordSet.contains(s.substring(lo, hi))) { //(3)
+                dp[hi] = true
+                break //(4)
+            }
+        }
+    }
+    
+    return dp[len] //(5)
+}
+
+fun main(args: Array<String>) {
+    //Input: s = "leetcode", wordDict = ["leet","code"]
+    //Output: true
+    //Explanation: Return true because "leetcode" can be segmented as "leet code".
+    val s = "leetcode"
+    val wordDict: List<String> = arrayListOf("leet","code")
+    print(wordBreak(s, wordDict))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-377:Combination Sum IV](https://leetcode.com/problems/combination-sum-iv/)
+##### Solution Explanation:
+```
+Solution Approach:
+DP
+=================================================================================================================================================================
+
+Idea:
+With this problem, we can easily imagine breaking up the solution into smaller pieces that we can use as stepping stones 
+towards the overall answer. For example, if we're searching for a way to get from 0 to our target number (T), 
+and if 0 < x < y < T, then we can see that finding out how many ways we can get 
+from y to T will help us figure out how many ways we can get from x to T, 
+all the way down to 0 to T. 
+
+This is a classic example of a top-down (memoization) dyanamic programming (DP) solution.
+
+Of course, the reverse is also true, and we could instead choose to use a bottom-up (tabulation) DP solution with the same result.
+
+Top-Down DP Approach: 
+---------------------
+
+Our DP array (dp) will contain cells (dp[i]) where i will represent the remaining space left before T 
+and dp[i] will represent the number of ways the solution (dp[T]) can be reached from i.
+At each value of i as we build out dp we'll iterate through the different nums in our number array (N) 
+and consider the cell that can be reached with each num (dp[i-num]). 
+The value of dp[i] will therefore be the sum of the results of each of those possible moves.
+
+We'll need to seed dp[0] with a value of 1 to represent the value of the completed combination, 
+then once the iteration is complete, we can return dp[T] as our final answer.
+
+Bottom-Up DP Approach: 
+---------------------
+
+Our DP array (dp) will contain cells (dp[i]) where i will represent the current count as we head towards T 
+and dp[i] will represent the number of ways we can reach i from the starting point (dp[0]).
+This means that dp[T] will represent our final solution.
+
+At each value of i as we build out dp we'll iterate through the different nums in our number array (N)
+and update the value of the cell that can be reached with each num (dp[i+num]) by adding the result 
+of the current cell (dp[i]). If the current cell has no value, then we can continue without 
+needing to iterate through N.
+
+We'll need to seed dp[0] with a value of 1 to represent the value of the common starting point, 
+then once the iteration is complete, we can return dp[T] as our final answer.
+```
+##### Complexity Analysis:
+```
+In both the top-down and bottom-up DP solutions, the time complexity is O(N * T) and the space complexity is O(T).
+
+
+TIME COMPLEXITY  : O(N*T)
+SPACE COMPLEXITY : O(T)
+```
+```python
+# Top-Down DP
+def combinationSum4_TopDownDP(nums: List[int], target: int) -> int:
+    dp = [0] * (target + 1)
+    dp[0] = 1
+    for i in range(1, target+1):
+        for num in nums:
+            if num <= i: dp[i] += dp[i-num]
+    return dp[target]
+
+# Bottom-Up DP
+def combinationSum4_BottomUpDP(nums: List[int], target: int) -> int:
+    dp = [0] * (target + 1)
+    dp[0] = 1
+    for i in range(target):
+        if not dp[i]: continue
+        for num in nums:
+            if num + i <= target: dp[i+num] += dp[i]
+    return dp[target]
+
+if __name__ == "__main__":
+    #Input: nums = [1,2,3], target = 4
+    #Output: 7
+    #Explanation:
+    #The possible combination ways are:
+    #(1, 1, 1, 1)
+    #(1, 1, 2)
+    #(1, 2, 1)
+    #(1, 3)
+    #(2, 1, 1)
+    #(2, 2)
+    #(3, 1)
+    #Note that different sequences are counted as different combinations.
+    nums = [1,2,3]
+    target = 4
+    print(combinationSum4_TopDownDP(nums, target))
+    print(combinationSum4_BottomUpDP(nums, target))
+```
+```kotlin
+// Top-Down DP
+fun combinationSum4_TopDownDP(nums: IntArray, target: Int): Int {
+    val dp = IntArray(target + 1) { if (it == 0) 1 else 0 }
+    for (i in 1..target) {
+        for (num in nums) {
+            if (num <= i) {
+                dp[i] += dp.getOrNull(i - num) ?: 0
+            }
+        }
+    }
+    //return dp.last()
+    return dp[target]
+}
+
+// Bottom-Up DP
+fun combinationSum4_BottomUpDP(nums: IntArray, target: Int): Int {
+    val dp = IntArray(target + 1) { if (it == 0) 1 else 0 }
+    for (i in 0..target-1) {
+        if (dp[i] == 0) continue
+        for (num in nums) {
+            if ((num + i) <= target) {
+                dp[i+num] += dp.getOrNull(i) ?: 0
+            }
+        }
+    }
+    //return dp.last()
+    return dp[target]
+}
+
+
+fun main(args: Array<String>) {
+    //Input: nums = [1,2,3], target = 4
+    //Output: 7
+    //Explanation:
+    //The possible combination ways are:
+    //(1, 1, 1, 1)
+    //(1, 1, 2)
+    //(1, 2, 1)
+    //(1, 3)
+    //(2, 1, 1)
+    //(2, 2)
+    //(3, 1)
+    //Note that different sequences are counted as different combinations.
+    val nums = intArrayOf(1,2,3)
+    val target = 4
+    println(combinationSum4_TopDownDP(nums, target))
+    println(combinationSum4_BottomUpDP(nums, target))
+    //Input: nums = [9], target = 3
+    //Output: 0
+    val nums1 = intArrayOf(9)
+    val target1 = 3
+    println(combinationSum4_TopDownDP(nums1, target1))
+    println(combinationSum4_BottomUpDP(nums1, target1))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-198:House Robber](https://leetcode.com/problems/house-robber/)
+##### Solution Explanation:
+```
+Solution Approach:
+-----------------------------------
+Bottom-Up DP 2 ways:
+-----------------------------------
+1) Iterative + memo (bottom-up)
+2) Iterative + N variables (bottom-up)
+
+NOTE: For interview situation use method (2) => rob_iteratively_with_variables()
+=================================================================================================================================================================
+
+This particular problem and most of others can be approached using the following sequence:
+
+  1. Find recursive relation
+  2. Recursive (top-down)
+  3. Recursive + memo (top-down)
+  4. Iterative + memo (bottom-up)
+  5. Iterative + N variables (bottom-up)
+
+Step 1> Figure out recursive relation.
+------------------------------------------------
+A robber has 2 options: a) rob current house i; b) don't rob current house.
+If an option "a" is selected it means she can't rob previous i-1 house but can safely proceed to the one before previous i-2 and gets all cumulative loot that follows.
+If an option "b" is selected the robber gets all the possible loot from robbery of i-1 and all the following buildings.
+So it boils down to calculating what is more profitable:
+
+robbery of current house + loot from houses before the previous
+loot from the previous house robbery and any loot captured before that
+
+
+rob(i) = Math.max( rob(i - 2) + currentHouseValue, rob(i - 1) )
+
+Step 2. Recursive (top-down)
+------------------------------------------------
+
+public int rob(int[] nums) {
+    return rob(nums, nums.length - 1);
+}
+private int rob(int[] nums, int i) {
+    if (i < 0) {
+        return 0;
+    }
+    return Math.max(rob(nums, i - 2) + nums[i], rob(nums, i - 1));
+}
+
+Step 3. Recursive + memo (top-down).
+------------------------------------------------
+
+int[] memo;
+public int rob(int[] nums) {
+    memo = new int[nums.length + 1];
+    Arrays.fill(memo, -1);
+    return rob(nums, nums.length - 1);
+}
+
+private int rob(int[] nums, int i) {
+    if (i < 0) {
+        return 0;
+    }
+    if (memo[i] >= 0) {
+        return memo[i];
+    }
+    int result = Math.max(rob(nums, i - 2) + nums[i], rob(nums, i - 1));
+    memo[i] = result;
+    return result;
+}
+
+Much better, this should run in O(n) time. Space complexity is O(n) as well, because of the recursion stack, let's try to get rid of it.
+
+
+Step 4. Iterative + memo (bottom-up)
+------------------------------------------------
+public int rob(int[] nums) {
+    if (nums.length == 0) return 0;
+    int[] memo = new int[nums.length + 1];
+    memo[0] = 0;
+    memo[1] = nums[0];
+    for (int i = 1; i < nums.length; i++) {
+        int val = nums[i];
+        memo[i+1] = Math.max(memo[i], memo[i-1] + val);
+    }
+    return memo[nums.length];
+}
+
+
+Step 5. Iterative + 2 variables (bottom-up)
+------------------------------------------------
+We can notice that in the previous step we use only memo[i] and memo[i-1], so going just 2 steps back. We can hold them in 2 variables instead.
+This optimization is met in Fibonacci sequence creation and some other problems.
+
+/* the order is: prev2, prev1, num  */
+public int rob(int[] nums) {
+    if (nums.length == 0) return 0;
+    int prev1 = 0;
+    int prev2 = 0;
+    for (int num : nums) {
+        int tmp = prev1;
+        prev1 = Math.max(prev2 + num, prev1);
+        prev2 = tmp;
+    }
+    return prev1;
+}
+```
+##### Complexity Analysis:
+```
+For both the solutions mentioned in Steps 4 (rob_iteratively_using_memo) and 5 (rob_iteratively_with_variables)
+
+TIME COMPLEXITY  : O(N)
+SPACE COMPLEXITY : O(1)
+```
+```python
+#Bottom-Up DP 2 ways:
+#-----------------------------------
+#1) Iterative + memo (bottom-up)
+#2) Iterative + N variables (bottom-up)
+#
+#NOTE: For interview situation use method (2) => rob_iteratively_with_variables()
+"""
+Note to self:
+rerun "pylint house_robber.py; python3 house_robber.py"
+
+I use pyright to do static type checking in VSCode
+"""
+
+# pylint: disable = too-few-public-methods, no-self-use
+from typing import List # so you can do List[int]
+
+# https://leetcode.com/problems/house-robber/discuss/156523/From-good-to-great.-How-to-approach-most-of-DP-problems.
+# my take-away:
+# 1) recursive
+# 2) recursive memo
+# 3) iterative memo
+# 4) iterative "pointer" variables
+
+class Solution:
+    """solution for 'House Robber' on leetcode"""
+
+    def __init__(self):
+        self.memo = {}
+
+    def rob(self, houses: List[int]) -> int:
+        """
+        Gets the max loot from non-adjacent houses.
+        Stores data in the given list of houses.
+        """
+        # handle trivial cases:
+        if not houses:
+            return 0
+        if len(houses) == 1:
+            return houses[0]
+        if len(houses) == 2:
+            return max(houses[0], houses[1])
+        # return self.rob_recursively(houses, 0) # works
+        # return self.rob_iteratively(houses) # better
+        return self.rob_iteratively_with_variables(houses) # even better
+
+    def rob_recursively(self, houses: List[int], i: int) -> int:
+        """
+        TO FIND A RECURSIVE SOLUTION: THINK OF THE BASE CASES!!!
+        Either (1) loot this house (and then must skip next one),
+        or (2) don't loot this house (and loot the next one).
+        If you don't loot this house and not the next one either,
+        then you're being silly and are better off with case (1) above anyways.
+        (BTW: going left to right recursively until base case i >= len.)
+        """
+        if i >= len(houses):
+            return 0
+        if i in self.memo:
+            return self.memo[i]
+        loot_this_house_and_next_house = houses[i] + self.rob_recursively(houses, i + 2)
+        loot_next_house = self.rob_recursively(houses, i + 1)
+        max_loot = max(loot_this_house_and_next_house, loot_next_house)
+        self.memo[i] = max_loot
+        return max_loot
+
+    def rob_iteratively_using_memo(self, houses: List[int]) -> int:
+        """
+        Iterative solution: loot up to the NEXT house =
+        either (1) loot from this house + house 2 ago,
+        or (2) loot previous house.
+        (BTW: going left to right with O(n).)
+        """
+        self.memo[0] = houses[0]
+        # loop starting at the 2nd house:
+        for i in range(1, len(houses)):
+            if i - 2 < 0: # as if only getting 2nd house (otherwise invalid index)
+                loot_this_house_and_2_ago = houses[i]
+            else: # otherwise i - 2 is a valid index
+                loot_this_house_and_2_ago = houses[i] + self.memo[i - 2]
+            loot_previous_house = self.memo[i - 1]
+            self.memo[i] = max(loot_this_house_and_2_ago, loot_previous_house)
+        return self.memo[len(houses) - 1]
+
+    def rob_iteratively_with_variables(self, houses: List[int]) -> int:
+        """
+        (Iterative solution that uses "pointer" variables instead of memo.)
+        Improve on the iterative memo solution by noticing:
+            self.memo[i - 2] = houses[i - 2]
+            self.memo[i - 1] = houses[i - 1]
+        so:
+            loot_this_house_and_2_ago = this house + two ago
+            loot_previous_house = one ago
+        (BTW: going left to right with O(n).)
+        """
+        prev = 0
+        curr = 0
+        for house in houses:
+            # curr: current house = either previous house, or this house + two ago
+            # prev: just moves one to the next position
+            loot_this_house_and_2_ago = house + prev
+            loot_previous_house = curr
+            curr = max(loot_previous_house, loot_this_house_and_2_ago)
+            prev = loot_previous_house
+        return curr # = current house = either previous house, or this house + two ago
+
+if __name__ == "__main__":
+    def check_answer(houses, correct):
+        """helper function"""
+        answer = Solution().rob(houses)
+        assert answer == correct, f'{answer} should be {correct}'
+        print(answer, 'ok' if answer == correct else 'error')
+    check_answer(houses=[], correct=0) # empty
+    check_answer(houses=None, correct=0) # invalid
+    check_answer(houses=[1], correct=1) # simple
+    check_answer(houses=[111], correct=111) # simple
+    check_answer(houses=[1, 2], correct=2)
+    check_answer(houses=[1, 2, 3], correct=4)
+    check_answer(houses=[1, 2, 3, 1], correct=4)
+    check_answer(houses=[2, 7, 9, 3, 1], correct=12)
+    check_answer(houses=[9, 1, 1, 9], correct=18)
+    check_answer(houses=[0], correct=0)
+    check_answer(houses=[1, 0, 0, 0], correct=1)
+    check_answer(houses=[0, 1, 0, 0, 0], correct=1)
+    check_answer(houses=[0, 1, 0, 0, 0], correct=1)
+    check_answer(houses=[1, 0, 1, 0, 0, 1], correct=3)
+    check_answer(houses=[0, 1, 0, 1, 0, 0, 1], correct=3)
+    check_answer(houses=[155, 44, 52, 58, 250, 225, 109, 118, 211, \
+        73, 137, 96, 137, 89, 174, 66, 134, 26, 25, 205, 239, 85, 146, \
+        73, 55, 6, 122, 196, 128, 50, 61, 230, 94, 208, 46, 243, 105, \
+        81, 157, 89, 205, 78, 249, 203, 238, 239, 217, 212, 241, 242, \
+        157, 79, 133, 66, 36, 165], correct=4517) # requires fast algorithm
+    check_answer(houses=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10], correct=30)
+    check_answer(houses=[10, 9, 8, 7, 6, 5, 4, 3, 2, 1], correct=30)
+```
+```kotlin
+fun rob_iteratively_using_memo(houses: IntArray): Int {
+    //
+    //Iterative solution: loot up to the NEXT house =
+    //either (1) loot from this house + house 2 ago,
+    //or     (2) loot previous house.
+    //(BTW: going left to right with O(n).)
+    //
+    val len = houses.size
+    val memo = IntArray(houses.size)
+    memo[0] = houses[0]
+    var loot_this_house_and_2_ago = -1
+    var loot_previous_house = -1 
+    // loop starting at the 2nd house:
+    for (i in 1 until len) { 
+        if ((i - 2) < 0) { // as if only getting 2nd house (otherwise invalid index)
+           loot_this_house_and_2_ago = houses[i]
+        } else { // otherwise i - 2 is a valid index
+            loot_this_house_and_2_ago = houses[i] + memo[i - 2]
+            loot_previous_house = memo[i - 1]
+            memo[i] = maxOf(loot_this_house_and_2_ago, loot_previous_house)
+        }
+    }
+    return memo[len - 1]
+}
+
+fun rob_iteratively_with_variables(houses: IntArray): Int {
+    //
+    //(Iterative solution that uses "pointer" variables instead of memo.)
+    //Improve on the iterative memo solution by noticing:
+    //    self.memo[i - 2] = houses[i - 2]
+    //    self.memo[i - 1] = houses[i - 1]
+    //so:
+    //    loot_this_house_and_2_ago = this house + two ago
+    //    loot_previous_house = one ago
+    //(BTW: going left to right with O(n).)
+    //
+    var prev = 0
+    var curr = 0
+    for (house in houses) {
+        // curr: current house = either previous house, or this house + two ago
+        // prev: just moves one to the next position
+        val loot_this_house_and_2_ago = house + prev
+        val loot_previous_house = curr
+        curr = maxOf(loot_previous_house, loot_this_house_and_2_ago)
+        prev = loot_previous_house
+    }
+    return curr // = current house = either previous house, or this house + two ago
+}
+
+fun main(args: Array<String>) {
+    //Input: houses = [1,2,3,1]
+    //Output: 4
+    //Explanation: Rob house 1 (money = 1) and then rob house 3 (money = 3).
+    //Total amount you can rob = 1 + 3 = 4.
+    val houses = intArrayOf(1,2,3,1)
+    println(rob_iteratively_using_memo(houses))
+    println(rob_iteratively_with_variables(houses))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-213:House Robber II](https://leetcode.com/problems/house-robber-ii/)
+##### Solution Explanation:
+```
+Solution Approach:
+-----------------------------------
+Bottom-Up DP => Iterative + N variables (bottom-up)
+
+Variant of [ House Robber | LeetCode Problem 198 | https://leetcode.com/problems/house-robber/ ] ... can be solved by just calling the solution for LC-198 twice.
+=================================================================================================================================================================
+This problem can be seen as follow-up question for problem 198. House Robber. 
+
+If thief choose to rob first house, then thief cannot rob last house. Simiarly, if choose to rob last house, then cannot rob first.
+So if we are given houses [1,3,4,5,6,7], then we are taking max from:
+1.[1,3,4,5,6] OR
+2.[3,4,5,6,7]
+
+whichever's max value is larger.
+So we just do 2 pass of dp and take the larger one. And the problem is reduced to House Robber I [ House Robber | LeetCode Problem 198 | https://leetcode.com/problems/house-robber/ ].
+```
+##### Complexity Analysis:
+```
+Time Complexity: time complexity is O(n), because we use dp problem with complexity O(n) twice. 
+Space complexity is O(1), because in python lists passed by reference and space complexity of House Robber problem is O(1).
+
+TIME COMPLEXITY  : O(N)
+SPACE COMPLEXITY : O(1)
+```
+```python
+from typing import List
+
+class Solution:
+
+    def __init__(self):
+        self.memo = {}
+
+    def rob_dp(self, houses: List[int], start: int, end: int) -> int:
+        prev = 0
+        curr = 0
+        for i in range(start,end+1):
+            loot_this_house_and_2_ago = houses[i] + prev
+            loot_previous_house = curr
+            curr = max(loot_previous_house, loot_this_house_and_2_ago)
+            prev = loot_previous_house
+        return curr
+
+    def rob(self, houses: List[int]) -> int:
+        return max(self.rob_dp(houses, 0, len(houses)-2), self.rob_dp(houses, 1, len(houses)-1))
+
+if __name__ == "__main__":
+    #Input: nums = [2,3,2]
+    #Output: 3
+    #Explanation: You cannot rob house 1 (money = 2) and then rob house 3 (money = 2), because they are adjacent houses.
+    houses = [2,3,2]
+    solution = Solution()
+    print(solution.rob(houses))
+```
+```kotlin
+fun rob_dp(houses: IntArray, start: Int, end: Int): Int {
+    var prev = 0
+    var curr = 0
+    for (i in start..end) {
+        val loot_this_house_and_2_ago = houses[i] + prev
+        val loot_previous_house = curr
+        curr = maxOf(loot_previous_house, loot_this_house_and_2_ago)
+        prev = loot_previous_house
+    }
+    return curr
+}
+
+fun rob(houses: IntArray): Int {
+    return maxOf(rob_dp(houses, 0, houses.size-2), rob_dp(houses, 1, houses.size-1))
+}
+
+fun main(args: Array<String>) {
+    //Input: nums = [2,3,2]
+    //Output: 3
+    //Explanation: You cannot rob house 1 (money = 2) and then rob house 3 (money = 2), because they are adjacent houses.
+    val houses = intArrayOf(2,3,2)
+    println(rob(houses))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-91:Decode Ways](https://leetcode.com/problems/decode-ways/)
+##### Solution Explanation:
+```
+DP Approach 1>
+------------------
+Use a dp array of size n + 1 to save subproblem solutions.
+
+dp[0] means an empty string will have one way to decode,
+dp[1] means the way to decode a string of size 1.
+
+Check one digit and two digit combination and save the results along the way.
+
+In the end, dp[n] will be the end result.
+
+For example:
+s = "231"
+index 0: extra base offset. dp[0] = 1
+index 1: # of ways to parse "2" => dp[1] = 1
+index 2: # of ways to parse "23" => "2" and "23", dp[2] = 2
+index 3: # of ways to parse "231" => "2 3 1" and "23 1" => dp[3] = 2
+
+DP Approach 2> ( SPACE OPTIMIZATION - Constant Space )
+------------------
+We can use two variables to store the previous results.
+Since we only use dp[i-1] and dp[i-2] to compute dp[i]. 
+Why not just use two variable prev1, prev2 instead?
+This can reduce the space to O(1)
+```
+##### Complexity Analysis:
+```
+For DP Approach 1>
+
+TIME COMPLEXITY  : O(N)
+SPACE COMPLEXITY : O(N)
+
+For DP Approach 2>
+
+TIME COMPLEXITY  : O(N)
+SPACE COMPLEXITY : O(1)
+```
+```python
+#DP Approach 1>
+#------------------
+def numDecodings(s: str) -> int:
+    if not s or s[0] == '0':
+        return 0
+
+    dp = [0 for x in range(len(s) + 1)]
+    dp[0] = 1
+    dp[1] = 1 if 0 < int(s[0]) <= 9 else 0
+
+    for i in range(2, len(s) + 1):
+        first = int(s[i-1:i])
+        second = int(s[i-2:i])
+        if 1 <= first <= 9:
+            dp[i] += dp[i - 1]
+        if 10 <= second <= 26:
+            dp[i] += dp[i - 2]
+    return dp[len(s)]
+
+if __name__ == "__main__":
+    #Input: s = "12"
+    #Output: 2
+    #Explanation: "12" could be decoded as "AB" (1 2) or "L" (12).
+    s = "12"
+    print(numDecodings(s))
+
+#DP Approach 2> ( SPACE OPTIMIZATION - Constant Space )
+#------------------
+def numDecodings(s: str) -> int:
+    if not s or s[0] == '0':
+        return 0
+
+    # pre represents dp[i-1]
+    pre = 1
+    # ppre represents dp[i-2]
+    ppre = 0
+    for i in range(1, len(s) + 1):
+        temp = pre
+        if s[i - 1] == "0":
+            pre = 0
+        if i > 1 and 10 <= int(s[i-2:i]) <= 26:
+            pre += ppre
+        ppre = temp
+    return pre
+
+if __name__ == "__main__":
+    #Input: s = "12"
+    #Output: 2
+    #Explanation: "12" could be decoded as "AB" (1 2) or "L" (12).
+    s = "12"
+    print(numDecodings(s))
+```
+```kotlin
+//DP Approach 1>
+//------------------
+fun numDecodings(s: String): Int {
+    if (s.isEmpty() || s[0] == '0') return 0
+
+    val n = s.length
+    val dp = IntArray(n + 1)
+        
+    /*
+     * dp[0] is set to 1 only to get the result for dp[2].
+     * For example, you have a string "12" , "12" could be decoded as "AB" (1 2) or "L" (12).
+     * Now if you select "12" , then dp[2] += dp[0]. If dp[0] is 0, you wont count '12' as a way to decode. Hence dp[0]
+     * needs to be 1.
+     */
+    dp[0] = 1 // To handle the case like "12"
+    dp[1] = if ((s[0] > '0') and (s[0] <= '9')) 1 else 0
+        
+    for (i in 2..n) {
+        val first = s.substring(i - 1, i).toInt()
+        val second = s.substring(i - 2, i).toInt()
+            
+        if (first in 1..9) {
+            dp[i] += dp[i - 1]
+        }
+        if (second in 10..26) {
+            dp[i] += dp[i -2]
+        }
+    }
+    return dp[n]        
+}
+
+fun main(args: Array<String>) {
+    //Input: s = "12"
+    //Output: 2
+    //Explanation: "12" could be decoded as "AB" (1 2) or "L" (12).
+    val s = "12"
+    println(numDecodings(s))
+}
+
+//DP Approach 2> ( SPACE OPTIMIZATION - Constant Space )
+//------------------
+fun numDecodings(s: String): Int {
+    if (s.isEmpty() || s[0] == '0') return 0
+    val n = s.length
+    // pre represents dp[i-1]
+    var pre = 1
+    // ppre represents dp[i-2]
+    var ppre = 0
+    for (i in 1..n) {
+        val temp = pre
+        if (s[i - 1] == '0') {
+            pre = 0
+        }
+        if ( i > 1 ) {
+            if (s.substring(i - 2, i).toInt() in 10..26) pre += ppre
+        }
+        ppre = temp        
+    }
+
+    return pre
+}
+
+fun main(args: Array<String>) {
+    //Input: s = "12"
+    //Output: 2
+    //Explanation: "12" could be decoded as "AB" (1 2) or "L" (12).
+    val s = "12"
+    println(numDecodings(s))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-62:Unique Paths](https://leetcode.com/problems/unique-paths/)
+##### Solution Explanation:
+```
+Solution Approach:
+=================================================================================================================================================================
+DP without Recursion + Space Optimization
+
+- path[i,j] = Number of paths from [0,0] to [i,j].
+- path[0,j] = 1 and path[i,0] = 1
+- path[i,j] = path[i,j-1] + path[i-1,j]
+- return path[m-1, n-1]
+- We can start from row 1 and column 1 after initializing the path matrix to 1.
+
+Time and Space complexity: O(MN)
+
+- Space Optimization: Instead of 2D matrix, a single array can do the job and reduce space complexity to O(N)
+```
+##### Complexity Analysis:
+```
+TIME COMPLEXITY  : O(N)
+SPACE COMPLEXITY : O(1)
+```
+```python
+def uniquePaths(m: int, n: int) -> int:
+    if m == 0 or n == 0:
+        return 0
+    dp = [1]*n
+    for i in range(1,m):
+        for j in range(1,n):
+            dp[j] = dp[j-1] + dp[j]
+    return dp[-1]
+
+if __name__ == "__main__":
+    #Input: m = 3, n = 2
+    #Output: 3
+    #Explanation:
+    #From the top-left corner, there are a total of 3 ways to reach the bottom-right corner:
+    #1. Right -> Down -> Down
+    #2. Down -> Down -> Right
+    #3. Down -> Right -> Down
+    m = 3
+    n = 2
+    print(uniquePaths(m, n))
+```
+```kotlin
+fun uniquePaths(m: Int, n: Int): Int {
+    if ((m == 0) or (n == 0)) {
+        return 0
+    }
+
+    var dp = IntArray(n){1}
+
+    for (i in 1 until m) {
+        for (j in 1 until n){
+            dp[j] += dp[j-1]
+        }
+    }
+
+    return dp[n-1]        
+}
+
+fun main(args: Array<String>) {
+    //Input: m = 3, n = 2
+    //Output: 3
+    //Explanation:
+    //From the top-left corner, there are a total of 3 ways to reach the bottom-right corner:
+    //1. Right -> Down -> Down
+    //2. Down -> Down -> Right
+    //3. Down -> Right -> Down
+    val m = 3
+    val n = 2
+    println(uniquePaths(m, n))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-55:Jump Game](https://leetcode.com/problems/jump-game/)
+##### Solution Explanation:
+```
+Solution Approach:
+=================================================================================================================================================================
+Greedy Algorithm
+
+Greedy -- Reach means last num's maximum reach position.
+If current index > reach, then means can't reach current position from last number.
+
+1. We start travering the array from start
+2. While traversing, we keep a track on maximum reachable index and update it accordingly. 
+3. If we cannot reach the maxium reachable index we get out of loop ( If current index > reach, then means can't reach current position from last number ).
+```
+##### Complexity Analysis:
+```
+TIME COMPLEXITY  : O(N)
+SPACE COMPLEXITY : O(1)
+```
+```python
+from typing import List
+
+def canJump(nums: List[int]) -> bool:
+    reachable_ind = 0
+    for ind, val in enumerate(nums):
+        if ind > reachable_ind:
+            return False
+        reachable_ind = max(reachable_ind, ind + val) 
+            
+    return True
+
+if __name__ == "__main__":
+    #Input: nums = [2,3,1,1,4]
+    #Output: true
+    #Explanation: Jump 1 step from index 0 to 1, then 3 steps to the last index.
+    nums = [2,3,1,1,4]
+    print(canJump(nums))
+```
+```kotlin
+fun canJump(nums: IntArray): Boolean {
+    var reachable_ind = 0
+    for ((index, value) in nums.withIndex()) {
+        if (index > reachable_ind) {
+            return false
+        }
+        reachable_ind = maxOf(reachable_ind, index + value)
+    }            
+    return true
+}
+
+fun main(args: Array<String>) {
+    //Input: nums = [2,3,1,1,4]
+    //Output: true
+    //Explanation: Jump 1 step from index 0 to 1, then 3 steps to the last index.
+    val nums = intArrayOf(2,3,1,1,4)
+    println(canJump(nums))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
 ## String
 | #     | Title	                                         | url                                                                           | Time   | Space   | Difficulty | Tag	        | Note                   |
 | ----- | ---------------------------------------------- | ----------------------------------------------------------------------------- | ------ | ------- | ---------- | ------------ | ---------------------- |
-| 0149  | Longest Substring Without Repeating Characters | https://leetcode.com/problems/longest-substring-without-repeating-characters/ | _O(n)_ | _O(1)_  | Medium     |              |                        |
+| 0003  | Longest Substring Without Repeating Characters | https://leetcode.com/problems/longest-substring-without-repeating-characters/ | _O(n)_ | _O(1)_  | Medium     |              |                        |
 | 0424  | Longest Repeating Character Replacement        | https://leetcode.com/problems/longest-repeating-character-replacement/        | _O(n)_ | _O(1)_  | Medium     |              | Sliding Window         |
 | 0076  | Minimum Window Substring                       | https://leetcode.com/problems/minimum-window-substring/                       | _O(n)_ | _O(k)_  | Hard       |              |                        |
 | 0242  | Valid Anagram                                  | https://leetcode.com/problems/valid-anagram/                                  | _O(n)_ | _O(1)_  | Easy       |              |                        |
@@ -3157,7 +4650,1038 @@ fun main(args: Array) {
 </div>
 <br/>
 
-####
+####  [LC-424:Longest Repeating Character Replacement](https://leetcode.com/problems/longest-substring-without-repeating-characters/)
+##### Solution Explanation:
+```
+Approach: Sliding Window Algorithm.
+=================================================================================================================================================================
+- The idea here is to find a window that satisfies the condition -
+- count of most repeatable character + no. of allowed replacements <= length of the window
+- Since the no. of allowed replacements is fixed, then the window size is directly proportional to the count of the most repeating character.
+- Initially the window keeps growing from the end, until all the allowed replacements are added up in the window until it reaches the max size.
+- The moment the condition is not satisfied (i.e., count of most repeatable character + no. of allowed replacements > size of the window), 
+  then we need to slide the window (not shrink) 
+  to the right and decrement the frequency of the character that is moved out of the window.
+- If the next character coming in is the most repeating character, then the window grows or else it simply slides again.
+```
+##### Complexity Analysis:
+```
+Time  : O(N)
+Space : O(N)
+```
+```python
+import collections
+def characterReplacement(s, k):        
+    # Base condition
+    if s == "":
+        return 0
+    longest_window = 0
+    window_counts = collections.defaultdict(int)
+    start = 0
+    for end in range(len(s)):
+        window_counts[s[end]] += 1
+        while ( (end - start + 1) - max(window_counts.values()) ) > k:
+            window_counts[s[start]] -= 1 
+            start += 1
+        longest_window = max(longest_window, end - start + 1)
+    return longest_window
+
+if __name__ == "__main__":
+    #Input: s = "ABAB", k = 2
+    #Output: 4
+    s = "ABAB"
+    k = 2
+    print(characterReplacement(s,k))
+```
+```kotlin
+fun characterReplacement(s: String, k: Int): Int {
+    // Base condition
+    if (s == "") {
+        return 0
+    }
+    var mostFreqCharCount = 0; var start = 0; var max=0
+    val map = mutableMapOf<Char, Int>()
+        
+    for (end in 0 until s.length){
+        map.put(s[end], map.getOrDefault(s[end], 0) + 1)
+        mostFreqCharCount = Math.max(map.get(s[end])!!, mostFreqCharCount)
+        if ( ( (end - start + 1) - mostFreqCharCount ) > k ) {
+            map.put(s[start], map.get(s[start])!! - 1)
+            start++                
+        }
+        max = Math.max(max, end - start + 1)
+    }
+    return max
+}
+
+fun main(args: Array) {
+    //Input: s = "ABAB", k = 2
+    //Output: 4
+    val s = "ABAB"
+    val k = 2
+    println(characterReplacement(s,k))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+####  [LC-76:Minimum Window Substring](https://leetcode.com/problems/minimum-window-substring/)
+##### Solution Explanation:
+```
+Approach: Sliding Window Algorithm.
+=================================================================================================================================================================
+- The idea is we use a variable-length sliding window which is gradually applied across the string.
+- We use two pointers: start and end to mark the sliding window.
+- We start by fixing the start pointer and moving the end pointer to the right.
+- The way we determine the current window is a valid one is by checking if all the target letters have been found in the current window.
+- If we are in a valid sliding window, we first make note of the sliding window of the most minimum length we have seen so far.
+- Next we try to contract the sliding window by moving the start pointer.
+- If the sliding window continues to be valid, we note the new minimum sliding window. 
+- If it becomes invalid (all letters of the target have been bypassed), 
+  we break out of the inner loop and go back to moving the end pointer to the right.
+```
+##### Complexity Analysis:
+```
+Time  : O(N)
+Space : O(N)
+```
+```python
+import collections
+def minWindow(s: str, t: str) -> str:
+    # Base condition
+    if (s == "" || t == "" || len(s) < len(t))  return ""
+    char_freq_in_target = collections.Counter(target)
+    start = 0
+    end = 0
+    shortest = ""
+    target_len = len(target)
+        
+    for end in range(len(s)):
+        # If we see a target letter, decrease the total target letter count
+        if char_freq_in_target[s[end]] > 0:
+            target_len -= 1
+
+        # Decrease the letter count for the current letter
+        # If the letter is not a target letter, the count just becomes -ve
+        char_freq_in_target[s[end]] -= 1
+
+        # If all letters in the target are found:
+        while target_len == 0:
+            window_len = end - start + 1
+            if not shortest or window_len < len(shortest):
+                # Note the new minimum window
+                shortest = s[start : end + 1]
+
+            # Increase the letter count of the current letter
+            char_freq_in_target[s[start]] += 1
+
+            # If all target letters have been seen and now, a target letter is seen with count > 0
+            # Increase the target length to be found. This will break out of the loop
+            if char_freq_in_target[s[start]] > 0:
+                target_len += 1
+                    
+            start+=1
+                
+    return shortest
+
+if __name__ == "__main__":
+    #Input: s = "ADOBECODEBANC", t = "ABC"
+    #Output: "BANC"
+    s = "ADOBECODEBANC"
+    t = "ABC"
+    print(minWindow(s,k))
+```
+```kotlin
+fun minWindow(s: String, t: String): String {
+    // Base condition
+    if (s.isEmpty() || t.isEmpty() || s.length < t.length)  return ""
+    //val charFreqInTarget = IntArray(128){ 0 }
+    //for(ch in t){
+    //    ++charFreqInTarget[ch.toInt()]
+    //}
+    val charFreqInTarget = t.groupingBy { it }.eachCount().toMutableMap()        
+    var start = 0
+    var end = 0
+    var shortest = ""
+    var lengthOfTarget = t.length
+
+    for (end in 0..s.length - 1) {
+        //if (charFreqInTarget[s[end].toInt()]-- > 0) --lengthOfTarget
+        if (charFreqInTarget.contains(s[end].toInt())) --lengthOfTarget
+            
+        while (lengthOfTarget == 0){
+            if (shortest.isEmpty() || end - start + 1 < shortest.length){
+                shortest = s.substring(start, end + 1)
+            }
+                
+            //if (++charFreqInTarget[s[start].toInt()] > 0) ++lengthOfTarget
+            if (charFreqInTarget.contains(s[start].toInt())) ++lengthOfTarget
+            ++start
+        }
+    }
+        
+    return shortest
+}
+
+fun main(args: Array) {
+    //Input: s = "anagram", t = "nagaram"
+    //Output: true
+    val s = "ADOBECODEBANC"
+    val t = "ABC"
+    println(minWindow(s,k))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+####  [LC-242:Valid Anagram](https://leetcode.com/problems/valid-anagram/)
+##### Solution Explanation:
+```
+Approach: HashMap
+=================================================================================================================================================================
+Algorithm
+----------
+- Simple question. Build a frequency map for s. Now check t against this frequency map.
+- Read the editorial about the followup about unicode characters.
+- Unicode has 4 bytes per character. So 2^32 or 4 billion characters
+- Using an array so big is not good. Use a hash-table.
+```
+##### Complexity Analysis:
+```
+Time  : O(N)
+Space : O(N)
+```
+```python
+def isAnagram(s: str, t: str) -> bool:
+    if (len(s) != len(t)) return False
+    """
+    Use dict to check whether the count of every element is the same or not.
+    """
+    hashMap = {}
+        
+    for i in s:
+        hashMap[i] = hashMap.get(i, 0) + 1
+            
+    for j in t:
+        if j not in hashMap:
+            return False
+        else:
+            #hashMap[j] -= 1
+            hashMap[j] = hashMap.get(j, 0) - 1
+        
+    #for v in hashMap.values():
+    #    if v != 0:
+    #        return False
+    #return True
+    return False not in [hashMap[char] == 0 for char in hashMap]
+
+if __name__ == "__main__":
+    #Input: s = "anagram", t = "nagaram"
+    #Output: true
+    s = "anagram"
+    t = "nagaram"
+    print(isAnagram(s, t))
+```
+```kotlin
+fun isAnagram(s: String, t: String): Boolean {
+    if (s.length != t.length) return false
+    val hashMap = HashMap<String, Int>()
+    for (i in s)
+        hashMap[i.toString()] = (hashMap[i.toString()] ?: 0) + 1
+    for (j in t) {
+        if (hashMap[j.toString()] == null)
+            return false
+        //hashMap[j.toString()] = hashMap[j.toString()]!! - 1
+        hashMap[j.toString()] = (hashMap[i.toString()] ?: 0) - 1
+    }
+    return hashMap.values.all { it == 0 }
+}
+
+fun main(args: Array<String>) {
+    //Input: s = "anagram", t = "nagaram"
+    //Output: true
+    val s = "anagram"
+    val t = "nagaram"
+    println(isAnagram(s, t))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+####  [LC-49:Group Anagrams](https://leetcode.com/problems/group-anagrams/)
+##### Solution Explanation:
+```
+Approach: HashMap
+=================================================================================================================================================================
+Algorithm
+----------
+Explanation
+We loop through each input string and determine the frequency of each letter in it, considering all 26 English lowercase letters.
+We transform the frequency list into a tuple which will then be used as a key to access the list of anagrams.
+The given input string will then be appended to it.
+
+For the python solution we use a dict where:
+key: tuple of the frequency of 26 letters, value: [string].
+
+For the kotlin soluton we use a Pair where:
+encodeToPair encode strings to a pair of array of letters' frequencies and the string itself.
+```
+##### Complexity Analysis:
+```
+Time  : O(N)
+Space : O(N)
+
+Definitions
+n: The total number of letters.
+
+Runtime Complexity
+O(n) for examining each input letter once. The dictionary operations are expected to be in O(1).
+
+Space Complexity
+O(n) for storing each input string.
+```
+```python
+import collections
+from typing import List
+
+def groupAnagrams(strs: List[str]) -> List[List[str]]:
+    if not strs: 
+        return []    
+    if len(strs) < 2:
+        return [strs]
+    #key: tuple of the frequency of 26 letters, value: [string]
+    d = collections.defaultdict(list)
+    # only the frequency of each letter matters
+    for s in strs:
+        arr = [0] * 26
+        for c in s:
+            arr[ord(c) - ord('a')] += 1
+        d[tuple(arr)].append(s)
+    # turn the values of dict into a list
+    return list(d.values())
+
+
+if __name__ == "__main__":
+    #Input: strs = ["eat","tea","tan","ate","nat","bat"]
+    #Output: [["bat"],["nat","tan"],["ate","eat","tea"]]
+    #Any order is acceptable, so the below is also correct:
+    #[[eat, tea, ate], [tan, nat], [bat]]
+    strs = ["eat","tea","tan","ate","nat","bat"]
+    print(groupAnagrams(strs))
+```
+```kotlin
+private val ALPHABET_LENGTH = 26
+private val ASCII_OF_LOWERCASE_A = 97
+    
+private fun encodeToPair(str: String): Pair<String, String> {
+    var theList = IntArray(ALPHABET_LENGTH) { 0 }
+    for (char in str) ++theList[char.toInt() - ASCII_OF_LOWERCASE_A]
+    return Pair(theList.joinToString(), str)
+}
+    
+fun groupAnagrams(strs: Array<String>): List<List<String>> {
+    if (strs.isEmpty()) {
+        return emptyList()
+    }
+    if (strs.size < 2) {
+        return emptyList()
+    }
+    return strs
+        .map { encodeToPair(it) }
+        .groupBy { it.first }
+        .toList()
+        .map{ it.second.map{ it.second } };
+}
+
+fun main(args: Array<String>) {
+    //Input: strs = ["eat","tea","tan","ate","nat","bat"]
+    //Output: [["bat"],["nat","tan"],["ate","eat","tea"]]
+    //Any order is acceptable, so the below is also correct:
+    //[[eat, tea, ate], [tan, nat], [bat]]
+    val strs = arrayOf("eat","tea","tan","ate","nat","bat")
+    println(groupAnagrams(strs))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+####  [LC-678:Valid Parenthesis String](https://leetcode.com/problems/valid-parenthesis-string/)
+##### Solution Explanation:
+```
+Approach: Stack
+=================================================================================================================================================================
+Algorithm
+----------
+- We can use a stack to keep track of the order of brackets seen in s and know whether the current bracket matches the last one seen.
+- The stack will only contain openBrackets and we will use the openToCloseBracket mapping to check that the latest open bracket has a matching close bracket.
+- I.e. The top of the stack (stack[-1]) should be an open bracket that matches the current close bracket, if the current bracket is a close bracket.
+```
+##### Complexity Analysis:
+```
+Time  : O(N)
+Space : O(N)
+
+O(n) time, 
+O(n) space for when each of the characters are "(", "{", "[". This would result in a stack of size n
+```
+```python
+def isValid(s: str) -> bool:
+    stack = []
+    openBrackets = {'(', '[', '{'}
+    openToCloseBracket = {
+        '(': ')',
+        '[': ']',
+        '{': '}'
+    }
+        
+    for bracket in s:
+        # Only add open brackets to the stack.
+        if bracket in openBrackets:
+            stack.append(bracket)
+        # The stack is non-empty, and the last open bracket seen matches the close bracket.
+        elif stack and openToCloseBracket[stack[-1]] == bracket:
+            # Remove the matching open bracket from the stack.
+            stack.pop()
+        # The rules for valid bracket matching have been violated.
+        else:
+            return False
+                
+    # All brackets must be paired up, so the stack must be empty by the end of the string.
+    return len(stack) == 0
+
+if __name__ == "__main__":
+    #Input: s = "()[]{}"
+    #Output: True
+    s = "()[]{}"
+    print(isValid(s))
+```
+```kotlin
+import java.util.ArrayDeque
+
+fun isValid(s: String): Boolean {
+    val stack = ArrayDeque<Char>()
+
+    s.forEach {
+
+        when (it) {
+            '(', '[', '{' -> stack.push(it)
+            else -> {
+
+                val end: Char = when (it) {
+                    '}' -> '{'
+                    ']' -> '['
+                    ')' -> '('
+                    else -> throw RuntimeException("Unknown char $it")
+                }
+
+                if (end != stack.poll()) return false
+            }
+        }
+    }
+
+    return stack.isEmpty()
+}
+
+fun main(args: Array<String>) {
+    //Input: s = "()[]{}"
+    //Output: True
+    val s = "()[]{}"
+    println(isValid(s))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+####  [LC-125:Valid Palindrome](https://leetcode.com/problems/valid-palindrome/)
+##### Solution Explanation:
+```
+Approach: Two-Pointers
+=================================================================================================================================================================
+Algorithm
+----------
+- Normalize the string and convert to lowercase.
+- Use 2 pointers start and end to compare characters.
+- Skip non alphanumeric characters. Return False if characters do not match.
+```
+##### Complexity Analysis:
+```
+Time  : O(N)
+Space : O(1)
+=============================
+Time Complexity  : O(N)
+Since your checking every letter in the string. Because we move beg only to the right and end only to the left, until they meet.
+Space Complexity : O(1)
+We just use a couple of additional variables.
+```
+```python
+def isPalindrome(s: str) -> bool:
+    start, end = 0, len(s) - 1
+    while start < end:
+        if not s[start].isalnum():
+            start += 1
+        elif not s[end].isalnum():
+            end -= 1
+        elif s[start].lower() != s[end].lower():
+            return False
+        else:
+            start += 1
+            end -= 1
+    return True
+
+if __name__ == "__main__":
+    #Input: s = "A man, a plan, a canal: Panama"
+    #Output: true
+    #Explanation: "amanaplanacanalpanama" is a palindrome.    s = "()[]{}"
+    s = "A man, a plan, a canal: Panama"
+    print(isPalindrome(s))
+```
+```kotlin
+fun isPalindrome(s: String): Boolean {
+    var start = 0
+    var end = s.length - 1
+    while (true) {
+        if (start >= end) return true
+        if (!isAlnum(s[start])) {
+            start++
+        } else if (!isAlnum(s[end])) {
+            end--
+        } else if (!equal(s[start], s[end])) {
+            return false
+        } else {
+            start++
+            end--
+        }
+    }
+	return true
+}
+
+fun equal(char1: Char, char2: Char): Boolean {
+    return char1.toLowerCase() == char2.toLowerCase()
+}
+
+fun isAlnum(char: Char): Boolean {
+    return char in '0'..'9' || char in 'a'..'z' || char in 'A'..'Z'
+}
+
+fun main(args: Array<String>) {
+    //Input: s = "A man, a plan, a canal: Panama"
+    //Output: true
+    //Explanation: "amanaplanacanalpanama" is a palindrome.
+    val s = "A man, a plan, a canal: Panama"
+    println(isPalindrome(s))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+####  [LC-5:Longest Palindromic Substring](https://leetcode.com/problems/longest-palindromic-substring/)
+##### Solution Explanation:
+```
+Approach: Manacher's Algorithm
+=================================================================================================================================================================
+There are many ways to solve this problem. Most common way is to treat each character of the string as the center and expand left and right.
+Keep track of their lengths and return the string with maximum length.
+
+So, what’s the problem 🤔? The problem is the time complexity - it will be O(n2). Not so good, right?
+
+Let’s see what’s hurting us. We are expanding left and right treating each character as the center. 
+What if we only expand only at the necessary characters instead of expanding at each character?
+
+Can we do that 🤔? Yes, we can using the Manacher’s Algorithm. This algorithm intelligently uses characteristics 
+of a palindrome to solve the problem in linear O(n) time -
+
+1. The left side of a palindrome is a mirror image of its right side.
+2. Odd length palindrome will be centered on a letter and even length palindrome will be centered in between 
+the two letters (thus there will be total 2n + 1 centers).
+
+Manacher’s Algorithm deals with the problem of finding the new center.
+Below are the steps -
+
+1. Initialize the lengths array to the number of possible centers.
+2. Set the current center to the first center.
+3. Loop while the current center is valid:
+ (a) Expand to the left and right simultaneously until we find the largest palindrome around this center.
+ (b) Fill in the appropriate entry in the longest palindrome lengths array.
+ (c) Iterate through the longest palindrome lengths array backwards and 
+     fill in the corresponding values to the right of the entry for the current center 
+	 until an unknown value (as described above) is encountered.
+ (d) set the new center to the index of this unknown value.
+4. Return the longest substring.
+```
+##### Complexity Analysis:
+```
+Time Complexity  : O(N)
+========================
+Note that at each step of the algorithm we’re either incrementing our current position in the input string or filling in an entry 
+in the lengths array. Since the lengths array has size linear in the size of the input array, 
+the algorithm has worst-case linear O(N) running time.
+
+Space Complexity : O(N)
+========================
+Since we are using the palindrome array to store the length of palindromes centered at each character,
+the space complexity will also be O(N).
+```
+```python
+def get_updated_string(s):
+    sb = ''
+    for i in range(0, len(s)):
+        sb += '#' + s[i]
+    sb += '#'
+    return sb
+
+# Manacher's Algorithm
+def longestPalindrome(s: str) -> str:
+    # Update the string to put hash "#" at the beginning, end and in between each character
+    updated_string = get_updated_string(s)
+    # Length of the array that will store the window of palindromic substring
+    length = 2 * len(s) + 1
+    # List to store the length of each palindrome centered at each element
+    p = [0] * length
+    # Current center of the longest palindromic string
+    c = 0
+    # Right boundary of the longest palindromic string
+    r = 0
+    # Maximum length of the substring
+    maxLength = 0
+    # Position index
+    position = -1
+    for i in range(0, length):
+        # Mirror of the current index
+        mirror = 2 * c - i
+        # Check if the mirror is outside the left boundary of current longest palindrome
+        if i < r:
+            p[i] = min(r - i, p[mirror])
+        # Indices of the characters to be compared
+        a = i + (1 + p[i])
+        b = i - (1 + p[i])
+        # Expand the window
+        while a < length and b >= 0 and updated_string[a] == updated_string[b]:
+            p[i] += 1
+            a += 1
+            b -= 1
+        # If the expanded palindrome is expanding beyond the right boundary of
+        # the current longest palindrome, then update c and r
+        if i + p[i] > r:
+            c = i
+            r = i + p[i]
+        if maxLength < p[i]:
+            maxLength = p[i]
+            position = i
+    offset = p[position]
+    result = ''
+    for i in range(position - offset + 1, position + offset):
+        if updated_string[i] != '#':
+            result += updated_string[i]
+    return result
+
+if __name__ == "__main__":
+    #Input: s = "babad"
+    #Output: "bab"
+    #Note: "aba" is also a valid answer.
+    s = "babad"
+    print(longestPalindrome(s))
+```
+```kotlin
+fun getUpdatedString(s: String): String {
+    val sb = StringBuilder()
+    for (element in s) {
+        sb.append("#").append(element)
+    }
+    sb.append("#")
+    return sb.toString()
+}
+
+// Manacher's Algorithm
+fun longestPalindrome(s: String): String {
+    // Update the string to put hash "#" at the beginning, end and in between each character
+    val updatedString = getUpdatedString(s)
+    // Length of the array that will store the window of palindromic substring
+    val length = 2 * s.length + 1
+    // Array to store the length of each palindrome centered at each element
+    val p = IntArray(length)
+    // Current center of the longest palindromic string
+    var c = 0
+    // Right boundary of the longest palindromic string
+    var r = 0
+    // Maximum length of the substring
+    var maxLength = 0
+    // Position index
+    var position = -1
+    for (i in 0 until length) {
+        // Mirror of the current index
+        val mirror = 2 * c - i
+        // Check if the mirror is outside the left boundary of current longest palindrome
+        if (i < r) {
+            p[i] = (r - i).coerceAtMost(p[mirror])
+        }
+        // Indices of the characters to be compared
+        var a = i + (1 + p[i])
+        var b = i - (1 + p[i])
+        // Expand the window
+        while (a < length && b >= 0 && updatedString[a] == updatedString[b]) {
+            p[i]++
+            a++
+            b--
+        }
+        // If the expanded palindrome is expanding beyond the right boundary of
+        // the current longest palindrome, then update c and r
+        if (i + p[i] > r) {
+            c = i
+            r = i + p[i]
+        }
+        if (maxLength < p[i]) {
+            maxLength = p[i]
+            position = i
+        }
+    }
+    val offset = p[position]
+    val result = StringBuilder()
+    for (i in position - offset + 1 until position + offset) {
+        if (updatedString[i] != '#') {
+            result.append(updatedString[i])
+        }
+    }
+    return result.toString()
+}
+
+fun main(args: Array<String>) {
+    //Input: s = "babad"
+    //Output: "bab"
+    //Note: "aba" is also a valid answer.    
+    val s = "babad"
+    println(longestPalindrome(s))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+####  [LC-647:Palindromic Substrings](https://leetcode.com/problems/palindromic-substrings/)
+##### Solution Explanation:
+```
+Approach: Manacher's Algorithm
+=================================================================================================================================================================
+ALGO:
+
+1. Define formatted_string by adding # between characters, and @ at the beginning.
+2. An array(palindrome_count) is used to mark the radius of the largest odd-length palindromic substring centered at index
+3. Traverse throughout the length of the formatted string, and check for 3 basic conditions:
+   i.   if the mirror is still in a valid position, update palindrome count for that index as minimum of current radius and expected mirror radius
+   ii.  if the mirror is valid for all characters from the centre to the respective boundaries, keep updating the palindromic count
+   iii. Shift the mirror if palindrome is found
+```
+##### Complexity Analysis:
+```
+Time Complexity  : O(N)
+========================
+Note that at each step of the algorithm we’re either incrementing our current position in the input string or filling in an entry 
+in the lengths array. Since the lengths array has size linear in the size of the input array, 
+the algorithm has worst-case linear O(N) running time.
+
+Space Complexity : O(N)
+========================
+Since we are using the palindrome array to store the length of palindromes centered at each character,
+the space complexity will also be O(N).
+```
+```python
+def countSubstrings(s: str) -> int:
+    # Pre-processed for Manacher's Algorithm
+    formatted_string = '@#' + '#'.join(s) + '#$'
+    palindrome_count  = [0] * len(formatted_string)
+    maxRight          = 0 # The most-right position ever touched by sub-strings
+    center            = 0 # The center for the sub-string touching the maxRight
+    for i in range(1, len(formatted_string) - 1):
+        if i < maxRight:
+            palindrome_count[i] = min(maxRight - i, palindrome_count[2 * center - i])
+        while formatted_string[i + palindrome_count[i] + 1] == formatted_string[i - palindrome_count[i] - 1]:
+            palindrome_count[i] += 1
+        if i + palindrome_count[i] > maxRight:
+            center = i
+            maxRight = i + palindrome_count[i]
+    return sum((v+1)//2 for v in palindrome_count)
+
+if __name__ == "__main__":
+    #Input: s = "abc"
+    #Output: 3
+    #Explanation: Three palindromic strings: "a", "b", "c".
+    s = "abc"
+    print(countSubstrings(s))
+```
+```kotlin
+fun countSubstrings(input: String): Int {
+    val formatted_string = CharArray(2 * input.length() + 3)
+    formatted_string[0] = '@'
+    formatted_string[1] = '#'
+    formatted_string[formatted_string.size - 1] = '$'
+    var t = 2
+    for (c in input.toCharArray()) {
+        formatted_string[t++] = c
+        formatted_string[t++] = '#'
+    }
+    val palindrome_count = IntArray(formatted_string.size)
+    // The center for the sub-string touching the maxRight
+    var center = 0
+    // The most-right position ever touched by sub-strings
+    var maxRight = 0
+    for (index in 1 until palindrome_count.size - 1) {
+        if (index < maxRight) {
+            palindrome_count[index] = Math.min(maxRight - index, palindrome_count[2 * center - index]) //min of (current mirror radius, expected mirror radius)
+        }
+        //mirror
+        while (formatted_string[index + palindrome_count[index] + 1] == formatted_string[index - palindrome_count[index] - 1]) {
+            palindrome_count[index]++
+        }
+        if (index + palindrome_count[index] > maxRight) { //shift the mirror if palindrome found
+            center = index
+            maxRight = index + palindrome_count[index]
+        }
+    }
+    var ans = 0
+    for (v in palindrome_count) ans += (v + 1) / 2
+    return ans
+}
+
+fun main(args: Array<String>) {
+    //Input: s = "abc"
+    //Output: 3
+    //Explanation: Three palindromic strings: "a", "b", "c".
+    val s = "abc"
+    println(countSubstrings(s))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+####  [LC-271:Encode and Decode Strings](https://leetcode.com/problems/encode-and-decode-strings/)
+##### Solution Explanation:
+```
+References: http://leetcode.libaoj.in/encode-and-decode-strings.html
+            https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Transfer-Encoding
+			https://en.wikipedia.org/wiki/Chunked_transfer_encoding
+=================================================================================================================================================================
+Approach: Chunked Transfer Encoding ( Similar to encoding used in HTTP v1.1 )
+=================================================================================================================================================================
+Pay attention to this approach because last year Google likes to ask that sort of low-level optimisation.
+Serialize and deserialize BST problem is a similar example.
+
+This approach is based on the encoding used in HTTP v1.1 . It doesn't depend on the set of input characters, 
+and hence is more versatile and effective than Approach 1 [ Approach 1: Non-ASCII Delimiter ].
+
+Data stream is divided into chunks. Each chunk is preceded by its size in bytes.
+
+Encoding Algorithm
+====================================================
+
+        +---+---+---+ +---+---+ 
+Input	| t | b | c | | d | e |
+        +---+---+---+ +---+---+ 
+
+Encode          Each chunk is preceded 
+                by its 4-bytes size
+
++---+---+---+---+---+---+---+---+---+---+---+---+---+ 
+| 0 | 0 | 0 | 3 | t | b | c | 0 | 0 | 0 | 2 | d | e |
++---+---+---+---+---+---+---+---+---+---+---+---+---+ 
+       \         /                 \          /
+        \       /                   \        /
+    size of next chunk               \      /
+                                 size of next chunk
+
+- Iterate over the array of chunks, i.e. strings.
+  + For each chunk compute its length, and convert that length into 4-bytes string.
+  + Append to encoded string :
+    [] 4-bytes string with information about chunk size in bytes.
+    [] Chunk itself.
+
+- Return encoded string.
+
+Decoding Algorithm
+====================================================
+
+        +---+---+---+ +---+---+ 
+Input	| t | b | c | | d | e |
+        +---+---+---+ +---+---+ 
+
+----------------------------------------------------------------
+
+Encode          Each chunk is preceded 
+                by its 4-bytes size
+
++---+---+---+---+---+---+---+---+---+---+---+---+---+ 
+| 0 | 0 | 0 | 3 | t | b | c | 0 | 0 | 0 | 2 | d | e |
++---+---+---+---+---+---+---+---+---+---+---+---+---+ 
+       \         /                 \          /
+        \       /                   \        /
+    size of next chunk               \      /
+                                 size of next chunk
+
+----------------------------------------------------------------
+
+Decode             1. Read next chunk length
+                   2. Read chunk itself and add it to output
+
+
+        +---+---+---+ +---+---+ 
+	| t | b | c | | d | e |
+        +---+---+---+ +---+---+ 
+
+- Iterate over the encoded string with a pointer i initiated as 0. While i < n :
+  + Read 4 bytes s[i: i + 4] . It's chunk size in bytes. Convert this 4-bytes string to integer length .
+  + Move the pointer by 4 bytes i += 4 .
+  + Append to the decoded array string s[i: i + length] .
+  + Move the pointer by length bytes i += length .
+- Return decoded array of strings.
+```
+##### Complexity Analysis:
+```
+Time Complexity  : O(N)
+========================
+O(N) both for encode and decode, where N is a number of strings in the input array.
+
+Space Complexity : O(1)
+========================
+O(1) for encode to keep the output, since the output is one string.O(N) for decode keep the output, since the output is an array of strings.
+```
+```python
+class Codec:
+    def len_to_str(self, x):
+        """
+        Encodes length of string to bytes string
+        """
+        x = len(x)
+        bytes = [chr(x >> (i * 8) & 0xff) for i in range(4)]
+        bytes.reverse()
+        bytes_str = ''.join(bytes)
+        return bytes_str
+    
+    def encode(self, strs):
+        """Encodes a list of strings to a single string.
+        :type strs: List[str]
+        :rtype: str
+        """
+        # encode here is a workaround to fix BE CodecDriver error
+        return ''.join(self.len_to_str(x) + x.encode('utf-8') for x in strs)
+        
+    def str_to_int(self, bytes_str):
+        """
+        Decodes bytes string to integer.
+        """
+        result = 0
+        for ch in bytes_str:
+            result = result * 256 + ord(ch)
+        return result
+    
+    def decode(self, s):
+        """Decodes a single string to a list of strings.
+        :type s: str
+        :rtype: List[str]
+        """
+        i, n = 0, len(s)
+        output = []
+        while i < n:
+            length = self.str_to_int(s[i: i + 4])
+            i += 4
+            output.append(s[i: i + length])
+            i += length
+        return output
+
+if __name__ == "__main__":
+    input = "Hello World"
+    print(f'Original word: {input}')
+    strs = [s.strip() for s in input.split(' ')]
+    codec = Codec()
+    encodedInput = codec.encode(strs)
+    decodedInput = codec.decode(encodedInput)
+    result = ' '.join(decodedInput)
+    print(f'Decoded word: {result}')
+```
+```kotlin
+class Codec {
+    // Encodes string length to bytes string
+    fun intToString(s: String): String {
+        val x: Int = s.length
+        val bytes = CharArray(4)
+        for (i in 3 downTo -1 + 1) {
+            bytes[3 - i] = (x shr i * 8 and 0xff).toChar()
+        }
+        return String(bytes)
+    }
+
+    // Encodes a list of strings to a single string.
+    fun encode(strs: List<String>): String {
+        val sb = StringBuilder()
+        for (s in strs) {
+            sb.append(intToString(s))
+            sb.append(s)
+        }
+        return sb.toString()
+    }
+
+    // Decodes bytes string to integer
+    fun stringToInt(bytesStr: String): Int {
+        var result = 0
+        for (b in bytesStr.toCharArray()) result = (result shl 8) + b.code
+        return result
+    }
+
+    // Decodes a single string to a list of strings.
+    fun decode(s: String): List<String> {
+        var i = 0
+        val n = s.length
+        val output = mutableListOf<String>()
+        while (i < n) {
+            val length = stringToInt(s.substring(i, i + 4))
+            i += 4
+            output.add(s.substring(i, i + length))
+            i += length
+        }
+        return output
+    }
+
+}
+
+fun main(args: Array<String>) {
+    val input = "Hello World"
+    println("Original word: [$input]")
+    var strs: List<String> = input.split(",").map { it.trim() }
+    val codec = Codec()
+    val encodedInput = codec.encode(strs)
+    val decodedInput = codec.decode(encodedInput)
+    val result = decodedInput.joinToString(" ")
+    println("Decoded word: [$result]")
+}
+```
 
 <br/>
 <div align="right">
