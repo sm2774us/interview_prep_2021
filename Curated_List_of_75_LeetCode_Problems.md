@@ -2339,6 +2339,690 @@ fun main(args: Array<String>) {
 </div>
 <br/>
 
+## Bit Manipulation
+| #     | Title	                                              | url                                                                           | Time     | Space    | Difficulty | Tag	        | Note                   |
+| ----- | --------------------------------------------------- | ----------------------------------------------------------------------------- | -------- | -------- | ---------- | ------------ | ---------------------- |
+| 0371  | [Sum of Two Integers](#lc-371sum-of-two-integers)   | https://leetcode.com/problems/sum-of-two-integers/                            | _O(1)_   | _O(1)_   | Easy       | LintCode     |                        |
+| 0191  | [Number of 1 Bits](#lc-191number-of-1-bits)         | https://leetcode.com/problems/number-of-1-bits/                               | _O(1)_   | _O(1)_   | Easy       |              |                        |
+| 0338  | [Counting Bits](#lc-338counting-bits)               | https://leetcode.com/problems/counting-bits/                                  | _O(n)_   | _O(n)_   | Medium     |              |                        |
+| 0268  | [Missing Number](#lc-268missing-number)             | https://leetcode.com/problems/missing-number/                                 | _O(n)_   | _O(1)_   | Medium     | LintCode     |                        |
+| 0190  | [Reverse Bits](#lc-190reverse-bits)                 | https://leetcode.com/problems/reverse-bits/                                   | _O(1)_   | _O(1)_   | Easy       |              |                        |
+
+#### [LC-371:Sum of Two Integers](https://leetcode.com/problems/sum-of-two-integers/)
+##### Solution Explanation:
+```
+=====================================
+Java/Kotlin
+=====================================
+For this problem, the main crux is that, we are dividing the task of adding 2 numbers into two parts -
+
+Let a = 13 and b = 10. Then we want to add them, a+b
+In binary, it would look as follows -
+a      =  1 1 0 1
+b      =  1 0 1 0
+--------------------
+a+b = (1) 0 1 1 1
+Now we can break the addition into two parts, one is simple addition without taking care of carry, and other is taking the carry.
+With that strategy in mind, we have the following -
+simpleAddition(a, b):
+a      =  1 1 0 1
+b      =  1 0 1 0
+--------------------
+a+b    =  0 1 1 1  
+
+carry(a, b):
+carry = 1 0 0 0 0
+*shift left by one, because we add the carry next left step :P
+Now if we can add the carry to our simpleAddition result, we can get our final answer. So add them using the simpleAddition method, and take care of the new carry again, unless carry becomes zero.
+This simpleAddition is performed by XOR ^operator, and the carry is performed by AND &operator.
+So our final answer would look as -
+(a^b) =    0 1 1 1 
++carry = 1 0 0 0 0 
+-----------------------------
+ans =    1 0 1 1 1
+-----------------------------
+which is 23
+
+References:
+===============================================================
+https://en.wikipedia.org/wiki/Adder_%28electronics%29#Half_adder
+
+The half adder adds two single binary digits A and B. It has two outputs, sum (S) and carry (C).
+The carry signal represents an overflow into the next digit of a multi-digit addition. 
+The value of the sum is 2C + S. 
+
+=====================================
+Python
+=====================================
+Python doesn't respect this int boundary that other strongly typed languages like Java and C++ have defined.
+So we need to use a mask.
+
+=====================================
+Let's recall the rule for taking two's complements: Flip all the bits, then plus one.
+
+So, to take the two's complement of -20 in the 32 bits sense. We flip all the 32 bits of 0xFFFFFFEC and add 1 to it.
+Note that here we cannot use the bit operation ~ because it will flip infinite many bits, not only the last 32.
+Instead, we xor it with the mask 0xFFFFFFFF. Recall that xor with 1 has the same effect as flipping.
+This only flips the last 32 bits, all the 0's to the far left remains intact.
+Then we add 1 to it to finish the two's complement and produce a valid 20
+
+(0xFFFFFFEC^mask)+1 == 0x14 == 20
+Next, we take the two's complement of 20 in the Python fashion. Now we can direcly use the default bit operation
+
+~20+1 == -20
+Write these two steps in one line
+
+~((0xFFFFFFEC^mask)+1)+1 == -20 == 0x...FFFFFFFFFFFFFFEC
+Wait a minute, do you spot anything weird? We are not supposed to use + in the first place, right? Why are there two +1's?
+Does it mean this method won't work? Hold up and let me give the final magic of today:
+
+for any number x, we have
+
+~(x+1)+1 = ~x
+(Here the whole (0xFFFFFFEC^mask) is considered as x).
+
+In other words, the two +1's miracly cancel each other! so we can simly write
+
+~(0xFFFFFFEC^mask) == -20
+To sum up, since Python allows arbitary length for integers, we first use a mask 0xFFFFFFFF to restrict the lengths.
+But then we lose information for negative numbers, so we use the magical formula ~(a^mask) to convert the result to Python-interpretable form.
+```
+##### Complexity Analysis:
+```
+Time  : O(1)
+Space : O(1)
+```
+```python
+def getSum(a: int, b: int) -> int:
+    """
+    :type a: int
+    :type b: int
+    :rtype: int
+    """
+    mask = 0xffffffff
+    while b:
+        sum = (a^b) & mask
+        carry = ((a&b)<<1) & mask
+        a = sum
+        b = carry
+
+    if (a>>31) & 1: # If a is negative in 32 bits sense
+        return ~(a^mask)
+    return a
+
+if __name__ == "__main__":
+    #Input: a = 1, b = 2
+    #Output: 3
+    a = 1
+    b = 2
+    print(getSum(a, b))
+```
+```kotlin
+fun getSum(a: Int, b: Int): Int {
+    var a = a
+    var b = b
+    while (b != 0) {
+        var carry = a.and(b) // carry contains common set bits
+        a = a.xor(b) // sum of bits where at least 1 common bit is not set
+        carry = carry.shl(1) // carry needs to be added 1 place left side
+        b = carry
+    }
+    return a
+}
+
+fun main(args: Array<String>) {
+    //Input: a = 1, b = 2
+    //Output: 3
+    val a = 1
+    val b = 2
+    println(getSum(a, b))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-191:Number of 1 Bits](https://leetcode.com/problems/number-of-1-bits/)
+##### Solution Explanation:
+```
+=================================================================================================================================================================
+Approach-1 ( Using masking )
+=================================================================================================================================================================
+Solution Explanation:
+Using masking
+=================================================================================================================================================================
+The best solution for this problem is to use "divide and conquer" to count bits:
+
+- First, count adjacent two bits, the results are stored separatedly into two bit spaces;
+- Second is to count the results from each of the previous two bits and store results to four bit spaces;
+- Repeat those steps and the final result will be sumed.
+- Check the following diagram from Hack's Delight book to understand the procedure:
+
+
+x = (x & 0x55555555) + ((x >> 1) & 0x55555555);
+x = (x & 0x33333333) + ((x >> 2) & 0x33333333);
+x = (x & 0x0F0F0F0F) + ((x >> 4) & 0x0F0F0F0F);
+x = (x & 0x00FF00FF) + ((x >> 8) & 0x00FF00FF);
+x = (x & 0x0000FFFF) + ((x >> 16) & 0x0000FFFF);
+
+The first line uses (x >> 1) & 0x55555555 rather than the perhaps more natural (x & 0xAAAAAAAA) >> 1,
+because the code shown avoids generating two large constants in a register. This would cost an
+instruction if the machine lacks the and not instruction. A similar remark applies to the other lines.
+Clearly, the last and is unnecessary, and other and’s can be omitted when there is no danger that a
+field’s sum will carry over into the adjacent field. Furthermore, there is a way to code the first line
+that uses one fewer instruction. This leads to the simplification shown in Figure 5–2, which executes
+in 21 instructions and is branch-free.
+
+Resource: https://doc.lagout.org/security/Hackers%20Delight.pdf (Chapter 5)
+
+
+=================================================================================================================================================================
+Approach-2 ( Using Brian Kernighan Algorithm )
+=================================================================================================================================================================
+Solution Explanation:
+Kernighan way
+=================================================================================================================================================================
+If we can somehow get rid of iterating through all the 32 bits and only iterate as many times as there are 1's, wouldn't that be better?
+Below is a solution that does this. It's based on Kernighan's number of set bits counting algorithm.
+=================================================================================================================================================================
+To solve this problem efficiently one must be familiar with Brian Kernighans Bit Manipulation Algorithm 
+which is used to count the number of set bits in a binary representation of a number k. (a bit is considered set if it has the value of 1)
+
+Resource: https://www.techiedelight.com/brian-kernighans-algorithm-count-set-bits-integer/
+=================================================================================================================================================================
+
+Using Brian Kernighan Algorithm, we will not check/compare or loop through all the 32 bits present
+but only count the set bits which is way better than checking all the 32 bits
+
+Suppose we have a number 00000000000000000000000000010110 (32 bits).
+
+Now using this algorithm we will skip the 0's bit and directly jump to set bit(1's bit) 
+and we don't have to go through each bit to count set bits i.e. the loop will be executed 
+only for 3 times in the mentioned example and not for 32 times.
+
+
+Assume we are working for 8 bits for better understanding, but the same logic apply for 32 bits
+So, we will take a number having 3 set bits.
+n = 00010110
+n - 1 = 00010101 (by substracting 1 from the number, all the bits gets flipped/toggled after the MSB(most significant right bit) including the MSB itself
+After applying &(bitwise AND) operator on n and n - 1 i.e. (n & n - 1), the righmost set bit will be turned off/toggled/flipped
+
+Let's understand step by step:
+===============================
+* 1st Iteration
+     00010110 --> (22(n) in decimal)
+  &  00010101 --> (21(n - 1) in decimal i.e. flipping all the bits of n(22) after MSB including the MSB)
+  -----------
+     00010100 --> (20(n & n - 1) in decimal i.e after applying bitwise AND(&), the MSB will be turned off)
+
+After applying bitwise AND(&) ,assign this number to n i.e. n = n & n - 1
+n = 00010100(20 in decimal)
+and increase the count
+bitCount++ (Initial bitCount = 0. By incrementing it, the bitCount = 1)
+-------------------------------------------------------------------------------------------------------------------------------
+* 2nd Iteration
+     00010100 --> (20(n) in decimal)
+  &  00010011 --> (19(n - 1) in decimal i.e. flipping all the bits of n(20) after MSB including the MSB)
+  -----------
+     00010000 --> (16(n & n - 1) in decimal i.e after applying bitwise AND(&), the MSB will be turned off)
+
+After applying bitwise AND(&) ,assign this number to n i.e. n = n & n - 1
+n = 00010000(16 in decimal)
+and increase the count
+bitCount++ (previous bitCount = 1. By incrementing it, the bitCount = 2)
+-------------------------------------------------------------------------------------------------------------------------------
+* 3rd Iteration
+     00010000 --> (16(n) in decimal)
+  &  00001111 --> (15(n - 1) in decimal i.e. flipping all the bits of n(16) after MSB including the MSB)
+  -----------
+     00000000 --> (0(n & n - 1) in decimal i.e after applying bitwise AND(&), the MSB will be turned off)
+
+After applying bitwise AND(&) ,assign this number to n i.e. n = n & n - 1
+n = 00000000 (0 in decimal)
+and increase the count
+bitCount++ (previous bitCount = 2. By incrementing it, the bitCount = 3)
+-------------------------------------------------------------------------------------------------------------------------------
+
+Now, since the n = 0, there will be no furthur iteration as the condition becomes false, so it will come 
+out of the loop and return bitCount which is 3 which is desired output.
+```
+##### Complexity Analysis:
+```
+For both approaches:
+
+Time  : O(1)
+Space : O(1)
+```
+```python
+# Approach-1 ( Using masking )
+def hammingWeight(n: int) -> int:
+    mask_sum_2bit = 0x55555555
+    mask_sum_4bit = 0x33333333
+    mask_sum_8bit = 0x0F0F0F0F
+    mask_sum_16bit = 0x00FF00FF
+    mask_sum_32bit = 0x0000FFFF
+
+    n = (n & mask_sum_2bit) + ((n >> 1) & mask_sum_2bit)
+    n = (n & mask_sum_4bit) + ((n >> 2) & mask_sum_4bit)
+    n = (n & mask_sum_8bit) + ((n >> 4) & mask_sum_8bit)
+    n = (n & mask_sum_16bit) + ((n >> 8) & mask_sum_16bit)
+    n = (n & mask_sum_32bit) + ((n >> 16) & mask_sum_32bit)
+
+    return n
+
+if __name__ == "__main__":
+    #Input: n = 00000000000000000000000000001011
+    #Output: 3
+    #Explanation: The input binary string 00000000000000000000000000001011 has a total of three '1' bits.
+    n = 0b00000000000000000000000000001011
+    print(hammingWeight(n))
+
+# Approach-2 ( Using Brian Kernighan Algorithm )
+def hammingWeight(n: int) -> int:
+    count = 0
+    while n:
+        count += 1
+        n = n & (n - 1)    
+    return count
+
+
+if __name__ == "__main__":
+    #Input: n = 00000000000000000000000000001011
+    #Output: 3
+    #Explanation: The input binary string 00000000000000000000000000001011 has a total of three '1' bits.
+    n = 0b00000000000000000000000000001011
+    print(hammingWeight(n))
+```
+```kotlin
+// Approach-1 ( Using masking )
+fun hammingWeight(n:Int):Int {
+    var num = n
+    val mask_sum_2bit: Int = 0x55555555.toInt()
+    val mask_sum_4bit: Int = 0x33333333.toInt()
+    val mask_sum_8bit: Int = 0x0F0F0F0F.toInt()
+    val mask_sum_16bit: Int = 0x00FF00FF.toInt()
+    val mask_sum_32bit: Int = 0x0000FFFF.toInt()
+
+    
+    num = ((num and 0xAAAAAAAA.toInt()) ushr 1) + (num and mask_sum_2bit)
+    num = ((num and 0xCCCCCCCC.toInt()) ushr 2) + (num and mask_sum_4bit)
+    num = ((num and 0xF0F0F0F0.toInt()) ushr 4) + (num and mask_sum_8bit)
+    num = ((num and 0xFF00FF00.toInt()) ushr 8) + (num and mask_sum_16bit)
+    num = ((num and 0xFFFF0000.toInt()) ushr 16) + (num and mask_sum_32bit)
+    return num
+}
+
+fun main(args: Array<String>) {
+    //Input: n = 00000000000000000000000000001011
+    //Output: 3
+    //Explanation: The input binary string 00000000000000000000000000001011 has a total of three '1' bits.
+    val n = 0b00000000000000000000000000001011
+    println(hammingWeight(n))
+}
+
+// Approach-2 ( Using Brian Kernighan Algorithm )
+fun hammingWeight(n:Int):Int {
+    var num = n
+    var count = 0
+    while (num != 0) {
+        num = num and (num - 1)
+        count++      
+    }
+   
+   return count
+}
+
+fun main(args: Array<String>) {
+    //Input: n = 00000000000000000000000000001011
+    //Output: 3
+    //Explanation: The input binary string 00000000000000000000000000001011 has a total of three '1' bits.
+    val n = 0b00000000000000000000000000001011
+    println(hammingWeight(n))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-338:Counting Bits](https://leetcode.com/problems/counting-bits/)
+##### Prerequisite:
+```
+=================================================================================================================================================================
+To solve this problem efficiently one must be familiar with Brian Kernighans Bit Manipulation Algorithm 
+which is used to count the number of set bits in a binary representation of a number k. (a bit is considered set if it has the value of 1)
+
+Resource: https://www.techiedelight.com/brian-kernighans-algorithm-count-set-bits-integer/
+```
+##### Solution Explanation:
+```
+Intuition:
+=================================================================================================================================================================
+
+This problem can be solved using dynamic programming combined with a bit manipulation technique.
+
+Overview
+------------------
+Recall the goal is to count the number of set bits in the binary representation of all integers 0 to n and record the set bits count of each number.
+This can be done in O(N) time and using O(N) space.
+
+To solve this problem efficiently one must be familiar with Brian Kernighans Bit Manipulation Algorithm which is used to count the number 
+of set bits in a binary representation of a number k. (a bit is considered set if it has the value of 1)
+
+Intially it seems just to be aware of Kernighans algorithm is enough to solve this problem, but this is not the case. 
+It would be naive to calculate the set bit count of each number from 1 to n and record the result for each number.
+This is because Kernighans Algorithm has a runtime of of O(S) where S is the number of set bits in a number. 
+This is because in each iteration a set bits in the original number is changed from 1 to 0 until there are no more set bits. 
+This must be done for all N numbers.
+The runtime of this approach is O(N*S) time. We can do better.
+
+
+Optimization
+We can use dynamic programming to eliminate uncessary work.
+
+The uncessary work is calculating the set bit count for each number from 0 to n.
+
+if we use a cache and leverage the heart of kernighans algorithm, we can avoid explictly calculating the set bit count for each number reducing the runtime to O(N)
+
+The heart of kernighans algorithm uses a bit manipulation techinuque to turn off (set 1 to 0) the least significant bit (rightmost) in a number. an AND operation is perfomerd be between the binary representations of k and k-1. this results in a number m who's set bits count is one less than k. The algorithm performs this operation on each iteration, eahc time updating k to the value of m. in python this operation is k = k & (k - 1)
+
+The key observation for optimization is that, if we count the set bits of each number in sorted order and we cache the results. for any given number k which no set bit count has been recorded, we can always lookup a number m who has a set bits count that is one less than k. if we know the set bit count of m, we can get the set bits count of k by adding one to the set bits count of m. lookup is possible because we are going in sorted order and it is the case m <= k.
+
+if we use kernighans bit manipulation technique, m can always be found in constant time.
+if we start at 0 we can build our way up to n. obtaining all counts along the way.
+
+if n = 4
+0 -> 0 set bits by default
+thus dp[0] = 0
+
+Now how do we count the set bits of the number 1?
+Using kernighans technique we can find a number that has one less set bit than the binary representation of 1. that number is zero.
+
+1 -> 1 & (1 - 1) = 0
+
+You can think of 1 ask and 0 asm from above explanation
+
+Thus if we add 1 + 0 we get the set bit count for the binary representation of one.
+count set bits in binary representation of 1 dp[1] = 1 + dp[0] = 1 + 0 = 1
+
+count set bits in binary representation of  2 
+dp = [0, 1, 0, 0, 0]
+2 -> 2 & (2 - 1) = 0
+base 2: 0010  & 0001 = 0000
+dp[2] = 1 + dp[0] =  0 + 1 = 1 
+
+count set bits in binary representation of  3 
+dp = [0, 1, 1, 0, 0]
+3 -> 3 & (3 - 1) = 3 & 2 = 2
+base 2: 0011  & 0010 = 0010 
+dp[3] = 1 + dp[2] =  1 + 1 = 2
+
+count set bits in binary representation of  4 
+dp = [0, 1, 1, 2, 0]
+4 -> 4 & (4 - 1) = 4 & 3 = 2
+base 2: 0100  & 0011 = 0100
+dp[4] = 1 + dp[4] =  1 + 0 = 1
+
+result 
+dp = [0, 1, 1, 2, 1]
+
+the pattern from these examples is 
+dp[i]  = 1 + dp[i & (i - 1)]
+```
+##### Complexity Analysis:
+```
+Time  : O(N)
+Space : O(N)
+```
+```python
+from typing import List
+
+def countBits(n: int) -> List[int]:
+    if num < 0: return []
+    dp = [0]*(num+1)
+    for i in range(1, num+1):
+        # Use kernighans algorithm for bit manipulation techinuque to turn off (set 1 to 0) the least significant bit (rightmost) in a number.
+        # i & i - 1,  yeilds a number m , where m <= i, and has one less set bit than i.
+        dp[i] = dp[i & (i-1)] + 1
+    return dp
+
+if __name__ == "__main__":
+    #Input: n = 2
+    #Output: [0,1,1]
+    #Explanation:
+    #0 --> 0
+    #1 --> 1
+    #2 --> 10
+    n = 2
+    print(countBits(n))
+```
+```kotlin
+fun countBits(n: Int): IntArray {
+    if (n < 0) return intArrayOf()
+    val dp = IntArray(n+1)
+    dp[0] = 0
+    for (i in 1 until n+1) {
+        dp[i] = dp[i and (i-1)]+1;
+    }
+    return dp
+}
+
+fun main(args: Array<String>) {
+    //Input: n = 2
+    //Output: [0,1,1]
+    //Explanation:
+    //0 --> 0
+    //1 --> 1
+    //2 --> 10
+    val n = 2
+    println(countBits(n).joinToString(","))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-268:Missing Number](https://leetcode.com/problems/missing-number/)
+##### Solution Explanation:
+```
+Bitwise XOR Operation
+=================================================================================================================================================================
+
+- The basic idea is to use XOR operation.
+- We all know that a^b^b =a, which means two xor operations with the same number will eliminate the number and reveal the original number.
+- In this solution, I apply XOR operation to both the index and value of the array. 
+- In a complete array with no missing numbers, the index and value should be perfectly corresponding( nums[index] = index), 
+  so in a missing array, what left finally is the missing number.
+```
+##### Complexity Analysis:
+```
+Time  : O(N)
+Space : O(1)
+```
+```python
+from typing import List
+
+def missingNumber(nums: List[int]) -> int:
+    missing_number = len(nums)
+    for i in range(len(nums)):
+        missing_number ^= nums[i] ^ i
+    
+    return missing_number
+
+if __name__ == "__main__":
+    #Input: nums = [3,0,1]
+    #Output: 2
+    #Explanation: n = 3 since there are 3 numbers, so all numbers are in the range [0,3].
+    #2 is the missing number in the range since it does not appear in nums.
+    nums = [3,0,1]
+    print(missingNumber(nums))
+```
+```kotlin
+fun missingNumber(nums: IntArray): Int {
+    var result = nums.size
+    for (i in 0 until nums.size) {
+        //result = result xor nums[i]
+        //result = result xor i
+        result = result.xor(nums[i]).xor(i)
+    }
+    return result    
+}
+
+fun main(args: Array<String>) {
+    //Input: nums = [3,0,1]
+    //Output: 2
+    //Explanation: n = 3 since there are 3 numbers, so all numbers are in the range [0,3].
+    //2 is the missing number in the range since it does not appear in nums.
+    var nums = intArrayOf(3,0,1)
+    println(missingNumber(nums))
+    //Input: nums = [0,1]
+    //Output: 2
+    //Explanation: n = 2 since there are 2 numbers, so all numbers are in the range [0,2].
+    //2 is the missing number in the range since it does not appear in nums.
+    nums = intArrayOf(0,1)
+    println(missingNumber(nums))
+    //Input: nums = [9,6,4,2,3,5,7,0,1]
+    //Output: 8
+    //Explanation: n = 9 since there are 9 numbers, so all numbers are in the range [0,9].
+    //8 is the missing number in the range since it does not appear in nums.
+    nums = intArrayOf(9,6,4,2,3,5,7,0,1)
+    println(missingNumber(nums))
+    //Input: nums = [0]
+    //Output: 1
+    //Explanation: n = 1 since there is 1 number, so all numbers are in the range [0,1].
+    //1 is the missing number in the range since it does not appear in nums.
+    nums = intArrayOf(0)
+    println(missingNumber(nums))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-190:Reverse Bits](https://leetcode.com/problems/reverse-bits/)
+##### Solution Explanation:
+```
+Bitwise XOR Operation
+=================================================================================================================================================================
+Approach 1: Bit Manipulation and Bit-wise XOR operation
+=================================================================================================================================================================
+
+- In each loop, use logical AND operation n & 1 to get the least significant bit and add it to the ans. 
+- To reverse the bit, shift n and ans in opposite directions.
+- What needs attention is that, after we add the last bit of n to ans at the 32nd loop,
+  the following left shift of ans is no longer needed.
+- The most significant bit of n has already at the right most position after previous 31 loops.
+=================================================================================================================================================================
+
+=================================================================================================================================================================
+Approach 2: Using Masking
+=================================================================================================================================================================
+For 8 bit binary number A B C D E F G H, the process is like: A B C D E F G H --> E F G H A B C D --> G H E F C D A B --> H G F E D C B A
+```
+##### Complexity Analysis:
+```
+For both approaches
+=================================================================================================================================================================
+Time  : O(log(N))
+Space : O(1)
+```
+```python
+# Approach 1: Bitwise XOR operation
+def reverseBits(n: int) -> int:
+    result = 0
+    for i in range(32):
+        result <<= 1
+        result |= n & 1
+        n >>= 1
+    return result
+
+if __name__ == "__main__":
+    #Input       : n = 00000010100101000001111010011100
+    #Output      : 964176192 (00111001011110000010100101000000)
+    #Explanation : The input binary string 00000010100101000001111010011100 represents the unsigned integer 43261596,
+    #so return 964176192 which its binary representation is 00111001011110000010100101000000.
+    nums = 0b00000010100101000001111010011100
+    print(reverseBits(nums))
+
+# Approach 2: Using Masking
+def reverseBits(n: int) -> int:
+    n = (n >> 16) | (n << 16)
+    n = ((n & 0xff00ff00) >> 8) | ((n & 0x00ff00ff) << 8)
+    n = ((n & 0xf0f0f0f0) >> 4) | ((n & 0x0f0f0f0f) << 4)
+    n = ((n & 0xcccccccc) >> 2) | ((n & 0x33333333) << 2)
+    n = ((n & 0xaaaaaaaa) >> 1) | ((n & 0x55555555) << 1)
+    return n
+
+if __name__ == "__main__":
+    #Input       : n = 00000010100101000001111010011100
+    #Output      : 964176192 (00111001011110000010100101000000)
+    #Explanation : The input binary string 00000010100101000001111010011100 represents the unsigned integer 43261596,
+    #so return 964176192 which its binary representation is 00111001011110000010100101000000.
+    nums = 0b00000010100101000001111010011100
+    print(reverseBits(nums))
+```
+```kotlin
+// Approach 1: Bitwise XOR operation
+fun reverseBits(n:Int):Int {
+    var num = n
+    var result = 0
+
+    for (i in 0 until 32) {
+        result = result.shl(1)
+        result += (num and 1)
+        num = num ushr 1
+    }
+
+    return result
+}
+
+fun main(args: Array<String>) {
+    //Input       : n = 00000010100101000001111010011100
+    //Output      : 964176192 (00111001011110000010100101000000)
+    //Explanation : The input binary string 00000010100101000001111010011100 represents the unsigned integer 43261596,
+    //so return 964176192 which its binary representation is 00111001011110000010100101000000.
+    val nums = 0b00000010100101000001111010011100
+    println(reverseBits(nums))
+}
+
+// Approach 2: Using Masking
+fun reverseBits(n:Int):Int {
+    var num = n
+    num = (num ushr 16) or (num shl 16);
+    num = ((num and 0xFF00FF00.toInt()) ushr 8) or ((num and 0x00FF00FF.toInt()) shl 8)
+    num = ((num and 0xF0F0F0F0.toInt()) ushr 4) or ((num and 0x0F0F0F0F.toInt()) shl 4)
+    num = ((num and 0xCCCCCCCC.toInt()) ushr 2) or ((num and 0x33333333.toInt()) shl 2)
+    num = ((num and 0xAAAAAAAA.toInt()) ushr 1) or ((num and 0x55555555.toInt()) shl 1)
+    return num
+}
+
+fun main(args: Array<String>) {
+    //Input       : n = 00000010100101000001111010011100
+    //Output      : 964176192 (00111001011110000010100101000000)
+    //Explanation : The input binary string 00000010100101000001111010011100 represents the unsigned integer 43261596,
+    //so return 964176192 which its binary representation is 00111001011110000010100101000000.
+    val nums = 0b00000010100101000001111010011100
+    println(reverseBits(nums))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
 ## String
 | #     | Title	                                         | url                                                                           | Time   | Space   | Difficulty | Tag	        | Note                   |
 | ----- | ---------------------------------------------- | ----------------------------------------------------------------------------- | ------ | ------- | ---------- | ------------ | ---------------------- |
@@ -2353,8 +3037,131 @@ fun main(args: Array<String>) {
 | 0647  | Palindromic Substrings                         | https://leetcode.com/problems/palindromic-substrings/                         | _O(n)_ | _O(n)_  | Medium     |              | `Manacher's Algorithm` |
 | 0271  | Encode and Decode Strings                      | https://leetcode.com/problems/encode-and-decode-strings/                      | _O(n)_ | _O(1)_  | Medium     | 🔒           |                        |
 
+####  [LC-3:Longest Substring Without Repeating Characters](https://leetcode.com/problems/longest-substring-without-repeating-characters/)
+##### Solution Explanation:
+```
+Approach: Sliding Window Algorithm.
+=================================================================================================================================================================
+
+From the input, we can gather the following information -
+
+1. Given data structure is a string which is a linear data structure.
+2. The output must be a substring - a part of the given string.
+3. Naive solution is to check for each combination of characters in the string
+
+Are you thinking what I am thinking 🤔 ? 
+Yes, this is a classic example of a problem that can be solved using the legendary technique - Sliding Window Algorithm.
+
+Following are the steps that we will follow -
+
+1. Have two pointers which will define the starting index start and ending index end of the current window. Both will be 0 at the beginning.
+2. Declare a Set that will store all the unique characters that we have encountered.
+3. Declare a variable maxLength that will keep track of the length of the longest valid substring.
+4. Scan the string from left to right one character at a time.
+5. If the character has not encountered before i.e., not present in the Set the we will add it and increment the end index. The maxLength will be the maximum of Set.size() and existing maxLength.
+6. If the character has encounter before, i.e., present in the Set, we will increment the start and we will remove the character at start index of the string.
+7. Steps #5 and #6 are moving the window.
+8. After the loop terminates, return maxLength.
+```
+##### Complexity Analysis:
+```
+a) Time  : O(N)
+============================
+We are scanning the string from left to right only once, hence the time complexity will be O(n).
+
+b) Space : O(1)
+============================
+We are using Set as a data structure to facilitate our computation, therefore, the space complexity should also be O(n), right? Wrong!
+
+WHY?
+
+The problem clearly states that the string contains only English letters, digits, symbols and spaces and are covered in 256 code points.
+Therefore, a string will be made up of a combination of these characters.
+
+Since a Set can contain only unique elements, at any point the size of Set cannot be more than 256.
+
+What does this mean? This means that the size of set is a function independent of the size of the input.
+It is a constant.
+Therefore, the space complexity will be O(1) (let me know in comments if you think otherwise).
+```
+```python
+def lengthOfLongestSubstring(s: str) -> int:
+    # Base condition
+    if s == "":
+        return 0
+    # Starting index of window
+    start = 0
+    # Ending index of window
+    end = 0
+    # Maximum length of substring without repeating characters
+    maxLength = 0
+    # Set to store unique characters
+    unique_characters = set()
+    # Loop for each character in the string
+    while end < len(s):
+        if s[end] not in unique_characters:
+            unique_characters.add(s[end])
+            end += 1
+            maxLength = max(maxLength, len(unique_characters))
+        else:
+            unique_characters.remove(s[start])
+            start += 1
+    return maxLength
+
+if __name__ == "__main__":
+    #Input: s = "abcabcbb"
+    #Output: 3
+    #Explanation: The answer is "abc", with the length of 3.
+    s = "abcabcbb"
+    print(lengthOfLongestSubstring(s))
+```
+```kotlin
+fun lengthOfLongestSubstring(s: String): Int {
+    // Base condition
+    if (s == "") {
+        return 0
+    }
+    // Starting window index
+    var start = 0
+    // Ending window index
+    var end = 0
+    // Maximum length of substring
+    var maxLength = 0
+    // This set will store the unique characters
+    val uniqueCharacters: MutableSet<Char> = HashSet()
+    // Loop for each character in the string
+    while (end < s.length) {
+        if (uniqueCharacters.add(s[end])) {
+            end++
+            maxLength = maxLength.coerceAtLeast(uniqueCharacters.size)
+        } else {
+            uniqueCharacters.remove(s[start])
+            start++
+        }
+    }
+    return maxLength
+}
+
+fun main(args: Array) {
+    //Input: s = "abcabcbb"
+    //Output: 3
+    //Explanation: The answer is "abc", with the length of 3.
+    val s = "abcabcbb"
+    println(lengthOfLongestSubstring(s))
+}
+```
+
 <br/>
 <div align="right">
     <b><a href="#algorithms">⬆️ Back to Top</a></b>
 </div>
 <br/>
+
+####
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
