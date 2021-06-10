@@ -4519,14 +4519,14 @@ fun main(args: Array<String>) {
 ## Graph
 | #     | Title	                                         | url                                                                           | Time   | Space  | Difficulty | Tag	       | Note                   |
 | ----- | ---------------------------------------------- | ----------------------------------------------------------------------------- | ------ | ------ | ---------- | ------------ | ---------------------- |
-| 0133  | Clone Graph                                    | https://leetcode.com/problems/clone-graph/                                    | O(n)   | O(n)   | Medium     |              |                        |
-| 0207  | Course Schedule                                | https://leetcode.com/problems/course-schedule/                    | O(\|V\| + \|E\|) | O(\|E\|) | Medium     |              | Topological Sort       |
-| 0417  | Pacific Atlantic Water Flow                    | https://leetcode.com/problems/pacific-atlantic-water-flow/                    | O(m * n) | O(m * n) | Medium |              |                        |
-| 0200  | Number of Islands                              | https://leetcode.com/problems/number-of-islands/                              | O(m * n) | O(m * n) | Medium |              | BFS, DFS, Union Find   |
-| 0128  | Longest Consecutive Sequence                   | https://leetcode.com/problems/longest-consecutive-sequence/                   | O(n)   | O(n)   | Hard       |              | Tricky                 |
-| 0269  | Alien Dictionary                               | https://leetcode.com/problems/alien-dictionary/                               | O(n)   | O(1)   | Hard       | 🔒       | Topological Sort, BFS, DFS |
-| 0261  | Graph Valid Tree                               | https://leetcode.com/problems/graph-valid-tree/      | _O(\|V\| + \|E\|)_ | _O(\|V\| + \|E\|)_  | Medium     | 🔒           |                        |
-| 0323  | Number of Connected Components in an Undirected Graph | https://leetcode.com/problems/number-of-connected-components-in-an-undirected-graph/ | O(n) | O(n) | Medium | 🔒     | Union Find             |
+| 0133  | [Clone Graph](#lc-133clone-graph) | https://leetcode.com/problems/clone-graph/                                    | O(n)   | O(n)   | Medium     |              |                        |
+| 0207  | [Course Schedule](#lc-207course-schedule) | https://leetcode.com/problems/course-schedule/                    | O(\|V\| + \|E\|) | O(\|E\|) | Medium     |              | Topological Sort       |
+| 0417  | [Pacific Atlantic Water Flow](#lc-417pacific-atlantic-water-flow) | https://leetcode.com/problems/pacific-atlantic-water-flow/                    | O(m * n) | O(m * n) | Medium |              |                        |
+| 0200  | [Number of Islands](#lc-200number-of-islands) | https://leetcode.com/problems/number-of-islands/                              | O(m * n) | O(m * n) | Medium |              | BFS, DFS, Union Find   |
+| 0128  | [Longest Consecutive Sequence](#lc-128longest-consecutive-sequence) | https://leetcode.com/problems/longest-consecutive-sequence/                   | O(n)   | O(n)   | Hard       |              | Tricky                 |
+| 0269  | [Alien Dictionary](#lc-269alien-dictionary) | https://leetcode.com/problems/alien-dictionary/                               | O(n)   | O(1)   | Hard       | 🔒       | Topological Sort, BFS, DFS |
+| 0261  | [Graph Valid Tree](#lc-261graph-valid-tree) | https://leetcode.com/problems/graph-valid-tree/      | _O(\|V\| + \|E\|)_ | _O(\|V\| + \|E\|)_  | Medium     | 🔒           |                        |
+| 0323  | [Number of Connected Components in an Undirected Graph](#lc-323number-of-connected-components-in-an-undirected-graph/) | https://leetcode.com/problems/number-of-connected-components-in-an-undirected-graph/ | O(n) | O(n) | Medium | 🔒     | Union Find             |
 
 #### [LC-133:Clone Graph](https://leetcode.com/problems/clone-graph/)
 ##### Solution Explanation:
@@ -6398,16 +6398,16 @@ fun main(args: Array<String>) {
 ## String
 | #     | Title	                                         | url                                                                           | Time   | Space   | Difficulty | Tag	        | Note                   |
 | ----- | ---------------------------------------------- | ----------------------------------------------------------------------------- | ------ | ------- | ---------- | ------------ | ---------------------- |
-| 0003  | Longest Substring Without Repeating Characters | https://leetcode.com/problems/longest-substring-without-repeating-characters/ | _O(n)_ | _O(1)_  | Medium     |              |                        |
-| 0424  | Longest Repeating Character Replacement        | https://leetcode.com/problems/longest-repeating-character-replacement/        | _O(n)_ | _O(1)_  | Medium     |              | Sliding Window         |
-| 0076  | Minimum Window Substring                       | https://leetcode.com/problems/minimum-window-substring/                       | _O(n)_ | _O(k)_  | Hard       |              |                        |
-| 0242  | Valid Anagram                                  | https://leetcode.com/problems/valid-anagram/                                  | _O(n)_ | _O(1)_  | Easy       |              |                        |
-| 0049  | Group Anagrams                                 | https://leetcode.com/problems/group-anagrams/                                 | _O(n)_ | _O(1)_  | Easy       |              |                        |
-| 0678  | Valid Parenthesis String                       | https://leetcode.com/problems/valid-parenthesis-string/                       | _O(n)_ | _O(1)_  | Medium     |              |                        |
-| 0125  | Valid Palindrome                               | https://leetcode.com/problems/valid-palindrome/                               | _O(n)_ | _O(1)_  | Easy       |              |                        |
-| 0005  | Longest Palindromic Substring                  | https://leetcode.com/problems/longest-palindromic-substring/                  | _O(n)_ | _O(n)_  | Medium     |              | `Manacher's Algorithm` |
-| 0647  | Palindromic Substrings                         | https://leetcode.com/problems/palindromic-substrings/                         | _O(n)_ | _O(n)_  | Medium     |              | `Manacher's Algorithm` |
-| 0271  | Encode and Decode Strings                      | https://leetcode.com/problems/encode-and-decode-strings/                      | _O(n)_ | _O(1)_  | Medium     | 🔒           |                        |
+| 0003  | [Longest Substring Without Repeating Characters](#lc-3longest-substring-without-repeating-characters) | https://leetcode.com/problems/longest-substring-without-repeating-characters/ | _O(n)_ | _O(1)_  | Medium     |              |                        |
+| 0424  | [Longest Repeating Character Replacement](#lc-424longest-repeating-character-replacement) | https://leetcode.com/problems/longest-repeating-character-replacement/        | _O(n)_ | _O(1)_  | Medium     |              | Sliding Window         |
+| 0076  | [Minimum Window Substring](#lc-76minimum-window-substring) | https://leetcode.com/problems/minimum-window-substring/                       | _O(n)_ | _O(k)_  | Hard       |              |                        |
+| 0242  | [Valid Anagram](#lc-242valid-anagram) | https://leetcode.com/problems/valid-anagram/                                  | _O(n)_ | _O(1)_  | Easy       |              |                        |
+| 0049  | [Group Anagrams](#lc-49group-anagrams) | https://leetcode.com/problems/group-anagrams/                                 | _O(n)_ | _O(1)_  | Easy       |              |                        |
+| 0678  | [Valid Parenthesis String](#lc-678valid-parenthesis-string) | https://leetcode.com/problems/valid-parenthesis-string/                       | _O(n)_ | _O(1)_  | Medium     |              |                        |
+| 0125  | [Valid Palindrome](#lc-125valid-palindrome) | https://leetcode.com/problems/valid-palindrome/                               | _O(n)_ | _O(1)_  | Easy       |              |                        |
+| 0005  | [Longest Palindromic Substring](#lc-5longest-palindromic-substring) | https://leetcode.com/problems/longest-palindromic-substring/                  | _O(n)_ | _O(n)_  | Medium     |              | `Manacher's Algorithm` |
+| 0647  | [Palindromic Substrings](#lc-647palindromic-substrings) | https://leetcode.com/problems/palindromic-substrings/                         | _O(n)_ | _O(n)_  | Medium     |              | `Manacher's Algorithm` |
+| 0271  | [Encode and Decode Strings](#lc-271encode-and-decode-strings) | https://leetcode.com/problems/encode-and-decode-strings/                      | _O(n)_ | _O(1)_  | Medium     | 🔒           |                        |
 
 ####  [LC-3:Longest Substring Without Repeating Characters](https://leetcode.com/problems/longest-substring-without-repeating-characters/)
 ##### Solution Explanation:
