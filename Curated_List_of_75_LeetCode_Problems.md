@@ -4516,6 +4516,1885 @@ fun main(args: Array<String>) {
 </div>
 <br/>
 
+## Graph
+| #     | Title	                                         | url                                                                           | Time   | Space  | Difficulty | Tag	       | Note                   |
+| ----- | ---------------------------------------------- | ----------------------------------------------------------------------------- | ------ | ------ | ---------- | ------------ | ---------------------- |
+| 0133  | Clone Graph                                    | https://leetcode.com/problems/clone-graph/                                    | O(n)   | O(n)   | Medium     |              |                        |
+| 0207  | Course Schedule                                | https://leetcode.com/problems/course-schedule/                    | O(\|V\| + \|E\|) | O(\|E\|) | Medium     |              | Topological Sort       |
+| 0417  | Pacific Atlantic Water Flow                    | https://leetcode.com/problems/pacific-atlantic-water-flow/                    | O(m * n) | O(m * n) | Medium |              |                        |
+| 0200  | Number of Islands                              | https://leetcode.com/problems/number-of-islands/                              | O(m * n) | O(m * n) | Medium |              | BFS, DFS, Union Find   |
+| 0128  | Longest Consecutive Sequence                   | https://leetcode.com/problems/longest-consecutive-sequence/                   | O(n)   | O(n)   | Hard       |              | Tricky                 |
+| 0269  | Alien Dictionary                               | https://leetcode.com/problems/alien-dictionary/                               | O(n)   | O(1)   | Hard       | 🔒       | Topological Sort, BFS, DFS |
+| 0261  | Graph Valid Tree                               | https://leetcode.com/problems/graph-valid-tree/      | _O(\|V\| + \|E\|)_ | _O(\|V\| + \|E\|)_  | Medium     | 🔒           |                        |
+| 0323  | Number of Connected Components in an Undirected Graph | https://leetcode.com/problems/number-of-connected-components-in-an-undirected-graph/ | O(n) | O(n) | Medium | 🔒     | Union Find             |
+
+#### [LC-133:Clone Graph](https://leetcode.com/problems/clone-graph/)
+##### Solution Explanation:
+```
+Solution Approach:
+=================================================================================================================================================================
+Idea
+----------------
+Turns out that maintaining a dictionary/hashmap that associates origianl node to its clone {node: clone_node} 
+makes this process very simple. 
+This hashmap also serves as a visited set to make sure you don't loop indefinitely while DFS/BFS.
+
+            +---+
+           /     \
+          +   1   +
+           \     /
+            +---+
+           /     \
+          /       \
+     +---+         +---+
+    /     \       /     \
+   +   2   +     +   4   +
+    \     /       \     /
+     +---+         +---+
+          \       /
+           \     /
+            +---+
+           /     \
+          +   3   +
+           \     /
+            +---+
+                   +--------------------------------- return this
+                   |
+                  \|/
+                   *
+d  =  {  (1) : Node (1),<-----+-----+
+         (2) : Node (2),<-----+     |
+         (3) : Node (3),<-----+     |
+         (4) : Node (4),<-----+-----+
+      }  /       \                   \
+        /         \                   \
+       /         Copies            Connecting the
+    Original                       Cloned Graph
+     Nodes
+```
+##### Complexity Analysis:
+```
+DFS
+---------------
+TIME COMPLEXITY  : O(N)
+SPACE COMPLEXITY : O(V + E) + O(N) ~ O(N)
+
+BFS
+---------------
+TIME COMPLEXITY  : O(N)
+SPACE COMPLEXITY : O(V + E) + O(N) ~ O(N)
+```
+```python
+# DFS ( Using Stack )
+import unittest
+
+# Definition for a Node.
+class Node:
+    def __init__(self, val = 0, neighbors = None):
+        self.val = val
+        self.neighbors = neighbors if neighbors is not None else []
+
+    def flatten_into_str(self):
+        return '{} neighbors: {}'.format(
+            self.val,
+            "".join([x.__repr__() for x in self.neighbors])
+        )			
+    def __repr__(self):
+        return '{} neighbors: {}'.format(
+            self.val,
+            [x.val for x in self.neighbors]
+		)
+
+class Solution:
+    def cloneGraph(node: 'Node') -> 'Node':
+        if not node: return
+        d = {node: Node(node.val)}
+        stack = [node]
+        while stack:
+            curNode = stack.pop()
+            for nei in curNode.neighbors:
+                if nei not in d:
+                    d[nei] = Node(nei.val)
+                    stack.append(nei)
+                d[curNode].neighbors.append(d[nei])
+        return d[node] # return the value of the original node which is a copy of that original node
+
+class Test(unittest.TestCase):
+    def setUp(self):
+	    pass
+	
+	def tearDown(self):
+	    pass
+		
+    def test_cloneGraph(self):
+	    root = Node(1, [Node(2, [Node(1),Node(3, [Node(2), Node(4)])]), Node(4, [Node(1),Node(3, [Node(2), Node(4)])])])
+		self.assertEqual(root.flatten_into_str(), cloneGraph(root)cloneGraph(root))
+
+if __name__ == "__main__":
+    unittest.main()
+	
+# BFS ( Using Deque )
+from collections import deque
+import unittest
+
+# Definition for a Node.
+class Node:
+    def __init__(self, val = 0, neighbors = None):
+        self.val = val
+        self.neighbors = neighbors if neighbors is not None else []
+
+    def flatten_into_str(self):
+        return '{} neighbors: {}'.format(
+            self.val,
+            "".join([x.__repr__() for x in self.neighbors])
+        )
+			
+    def __repr__(self):
+        return '{} neighbors: {}'.format(
+            self.val,
+            [x.val for x in self.neighbors]
+        )
+
+class Solution:
+    def cloneGraph(self, node: 'Node') -> 'Node':
+        if not node: return
+        # map original nodes to their clones
+        d = {node : Node(node.val)}
+        q = deque([node])        
+        while q:
+            for i in range(len(q)):
+                currNode = q.popleft()
+                for nei in currNode.neighbors:
+                    if nei not in d:
+                        # store copy of the neighboring node
+                        d[nei] = Node(nei.val)
+                        q.append(nei)
+                    # connect the node copy at hand to its neighboring nodes (also copies) -------- [1]
+                    d[currNode].neighbors.append(d[nei])
+        # return copy of the starting node ------- [2]
+        return d[node]
+
+class Test(unittest.TestCase):
+    def setUp(self):
+        pass
+	
+    def tearDown(self):
+        pass
+		
+    def test_cloneGraph(self):
+        solution = Solution()
+        root = Node(1, [Node(2, [Node(1),Node(3, [Node(2), Node(4)])]), Node(4, [Node(1),Node(3, [Node(2), Node(4)])])])
+        self.assertEqual(root.flatten_into_str(), solution.cloneGraph(root).flatten_into_str())
+
+if __name__ == "__main__":
+    unittest.main()
+```
+```kotlin
+// DFS ( Using Stack )
+
+// Definition for a Node.
+import java.util.HashMap
+import java.util.Stack
+
+class Node(var `val`: Int) {
+    var neighbors: ArrayList<Node?> = ArrayList<Node?>()
+
+    override fun toString() = "$`val`${if (neighbors.isNotEmpty()) neighbors.toString() else ""}"
+}
+
+class NodeBuilder {
+    private var parent: Node? = null
+    private lateinit var node: Node
+
+    operator fun Int.invoke(block: (NodeBuilder.() -> Node)? = null): Node {
+        node = Node(this)
+        parent?.neighbors?.add(node)
+        if (block != null) {
+            val nodeBuilder = NodeBuilder()
+            nodeBuilder.parent = this@NodeBuilder.node
+            nodeBuilder.block()
+        }
+        return node
+    }
+
+    companion object {
+        operator fun invoke(block: NodeBuilder.() -> Node): Node {
+            return NodeBuilder().block()
+        }
+    }
+}
+
+fun cloneGraph(node: Node?): Node? {
+    if (node == null) return node
+
+    val map = HashMap<Node, Node>()
+    val stack = Stack<Node>()
+    map[node] = Node(node.`val`)
+    stack.push(node)
+    while (!stack.isEmpty()) {
+        val cur: Node = stack.pop()
+        for (neighbor in cur.neighbors) {
+            if (!map.containsKey(neighbor)) {
+                map[neighbor!!] = Node(neighbor!!.`val`)
+                stack.push(neighbor)
+            }
+            map[cur]!!.neighbors.add(map[neighbor])
+        }
+    }
+    return map[node]!!
+}
+
+fun main(args: Array<String>) {
+    //Input: adjList = [[2,4],[1,3],[2,4],[1,3]]
+    //Output: [[2,4],[1,3],[2,4],[1,3]]
+    //Explanation: There are 4 nodes in the graph.
+    //1st node (val = 1)'s neighbors are 2nd node (val = 2) and 4th node (val = 4).
+    //2nd node (val = 2)'s neighbors are 1st node (val = 1) and 3rd node (val = 3).
+    //3rd node (val = 3)'s neighbors are 2nd node (val = 2) and 4th node (val = 4).
+    //4th node (val = 4)'s neighbors are 1st node (val = 1) and 3rd node (val = 3).
+    val root = NodeBuilder{
+        1 {
+            2 {
+                1()
+                3()
+            }
+            4 {
+                1()
+                3()
+            }
+        }
+    }
+    println(cloneGraph(root))
+}
+
+// BFS ( Using Deque )
+
+// Definition for a Node.
+import java.util.ArrayDeque
+import java.util.HashMap
+import java.util.HashSet
+
+class Node(var `val`: Int) {
+    var neighbors: ArrayList<Node?> = ArrayList<Node?>()
+
+    override fun toString() = "$`val`${if (neighbors.isNotEmpty()) neighbors.toString() else ""}"
+}
+
+class NodeBuilder {
+    private var parent: Node? = null
+    private lateinit var node: Node
+
+    operator fun Int.invoke(block: (NodeBuilder.() -> Node)? = null): Node {
+        node = Node(this)
+        parent?.neighbors?.add(node)
+        if (block != null) {
+            val nodeBuilder = NodeBuilder()
+            nodeBuilder.parent = this@NodeBuilder.node
+            nodeBuilder.block()
+        }
+        return node
+    }
+
+    companion object {
+        operator fun invoke(block: NodeBuilder.() -> Node): Node {
+            return NodeBuilder().block()
+        }
+    }
+}
+
+fun cloneGraph(node: Node?): Node? {
+    if (node == null) return node
+        
+    val map = HashMap<Node, Node>()
+    val q = ArrayDeque<Node>()
+    val seen = HashSet<Node>()
+
+    map[node] = Node(node.`val`)
+    q.offer(node)
+    seen.add(node)
+
+    while (!q.isEmpty()) {
+        val cur = q.poll()
+
+        for (neighbor in cur.neighbors) {
+            if (!seen.contains(neighbor)) {
+                map[neighbor!!] = Node(neighbor!!.`val`)
+                q.offer(neighbor)
+                seen.add(neighbor)
+            }
+            map[cur]!!.neighbors.add(map[neighbor])
+        }
+    }
+
+    return map[node]!!
+}
+
+fun main(args: Array<String>) {
+    //Input: adjList = [[2,4],[1,3],[2,4],[1,3]]
+    //Output: [[2,4],[1,3],[2,4],[1,3]]
+    //Explanation: There are 4 nodes in the graph.
+    //1st node (val = 1)'s neighbors are 2nd node (val = 2) and 4th node (val = 4).
+    //2nd node (val = 2)'s neighbors are 1st node (val = 1) and 3rd node (val = 3).
+    //3rd node (val = 3)'s neighbors are 2nd node (val = 2) and 4th node (val = 4).
+    //4th node (val = 4)'s neighbors are 1st node (val = 1) and 3rd node (val = 3).
+    val root = NodeBuilder{
+        1 {
+            2 {
+                1()
+                3()
+            }
+            4 {
+                1()
+                3()
+            }
+        }
+    }
+    println(cloneGraph(root))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-207:Course Schedule](https://leetcode.com/problems/course-schedule/)
+##### Solution Explanation:
+```
+----------------------------------
+BFS with Kahn's algorithm
+----------------------------------
+One of these algorithms, first described by Kahn (1962), works by choosing vertices in the same order as the eventual topological sort. 
+First, find a list of "start nodes" which have no incoming edges and insert them into a set S; at least one such node must exist in a non-empty acyclic graph.
+Then:
+----------------------------------
+L ← Empty list that will contain the sorted elements
+S ← Set of all nodes with no incoming edge
+while S is non-empty do
+    remove a node n from S
+    add n to tail of L
+    for each node m with an edge e from n to m do
+        remove edge e from the graph
+        if m has no other incoming edges then
+            insert m into S
+if graph has edges then
+    return error   (graph has at least one cycle)
+else 
+    return L   (a topologically sorted order)
+
+
+----------------------------------
+DFS with Tarjan Algorithm
+----------------------------------
+
+An alternative algorithm for topological sorting is based on depth-first search. The algorithm loops through each node of the graph,
+in an arbitrary order, initiating a depth-first search that terminates when it hits any node that has already been visited 
+since the beginning of the topological sort or the node has no outgoing edges (i.e. a leaf node):
+----------------------------------
+L ← Empty list that will contain the sorted nodes
+while there are unmarked nodes do
+    select an unmarked node n
+    visit(n)
+
+function visit(node n)
+    if n has a permanent mark then return
+    if n has a temporary mark then stop   (not a DAG)
+    mark n temporarily
+    for each node m with an edge from n to m do
+        visit(m)
+    mark n permanently
+    add n to head of L
+----------------------------------
+
+References:
+----------------------------------
+Kahn's Algorithm:
+----------------------------------
+https://en.wikipedia.org/wiki/Topological_sorting#CITEREFKahn1962
+----------------------------------
+Tarjan's Algorithm:
+----------------------------------
+https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm
+```
+##### Complexity Analysis:
+```
+DFS ( Tarjan's Algorithm )
+---------------
+TIME COMPLEXITY  : O(V + E) => As all it does is basically run a DFS. 
+                               However this asymptotic analysis assumes that looking up a vertex in a stack can be done in constant time.
+
+SPACE COMPLEXITY : O(N)     => The space complexity is linear as it makes use of additional space for the stack.
+
+BFS ( Kahn's Algorithm )
+---------------
+TIME COMPLEXITY  : O(V + E) => Since we're using an adjacency list.
+                               Each edge and vertex will only be visited once throughout the main loop logic.
+
+SPACE COMPLEXITY : O(V + E) => For the adjacency list.
+```
+```python
+# BFS with Kahn's algorithm ( Topological Sorting )
+def canFinish(numCourses: int, prerequisites: List[List[int]]) -> bool:
+    #base case 
+    if not prerequisites: return None  
+    L = []
+
+    in_degrees = defaultdict(int)
+    graph = defaultdict(list)
+    #Construct the graph 
+    for dest, src in prerequisites:
+        graph[src].append(dest)
+        in_degrees[dest] += 1 
+        
+    Q = [u for u in graph if in_degrees[u]==0]
+    while Q: #while Q is not empty 
+        curr = Q.pop() #remove a node from Q
+        L.append(curr) #add curr to tail of L
+        for v in graph[curr]: #for each node v with a edge e 
+            in_degrees[v] -= 1 #remove edge 
+            if in_degrees[v] == 0:
+                Q.append(v)
+
+    #return number of nodes w/o cycle == total number of courses
+    return len(L) == numCourses 
+
+    #check there exist a cycle
+    #for u in in_degrees: #if graph has edge 
+    #    if in_degrees[u]:
+    #        return False 
+    #return True 
+
+if __name__ == "__main__":
+    #Input: numCourses = 2, prerequisites = [[1,0]]
+    #Output: true
+    #Explanation: There are a total of 2 courses to take. 
+    #To take course 1 you should have finished course 0. So it is possible.
+    numCourses = 2
+    prerequisites = [[1,0]]
+    print(canFinish(numCourses, prerequisites))
+
+# DFS with Tarjan Algorithm
+def canFinish(numCourses: int, prerequisites: List[List[int]]) -> bool:
+    #base case 
+    if not prerequisites: return None  
+
+    #Construct a directed graph from `prerequisites`.
+    #initiate the graph, The nodes are `0` to `n-1`(nodes are origins)
+    graph = [[] for _ in range(numCourses)]
+    # there is an edge from `i` to `j` if `i` is the prerequisite of `j`. 
+    for x, y in prerequisites:
+        graph[x].append(y)   
+    #hold the paint status
+    #we initiate nodes which have not been visited, paint them as 0
+    paint = [0 for _ in range(numCourses)]
+    #if node is being visiting, paint it as -1, if we find a node painted as -1 in dfs,then there is a ring 
+    #if node has been visited, paint it as 1
+
+    def dfs(i):
+        #base cases 
+        if paint[i] == -1: #a ring 
+            return False
+        if paint[i] == 1: #visited 
+            return True
+        paint[i] = -1 #paint it as being visiting.
+        for j in graph[i]: #traverse i's neighbors 
+            if not dfs(j): #if there exist a ring.
+                return False
+        paint[i] = 1 #paint as visited and jump to the next.
+        return True
+
+    for i in range(numCourses):
+        if not dfs(i): #if there exist a ring.
+            return False
+    return True
+
+if __name__ == "__main__":
+    #Input: numCourses = 2, prerequisites = [[1,0]]
+    #Output: true
+    #Explanation: There are a total of 2 courses to take. 
+    #To take course 1 you should have finished course 0. So it is possible.
+    numCourses = 2
+    prerequisites = [[1,0]]
+    print(canFinish(numCourses, prerequisites))
+```
+```kotlin
+// BFS with Kahn's algorithm ( Topological Sorting )
+fun canFinish(numCourses: Int, prerequisites: Array<IntArray>): Boolean {
+    //base case
+    //if (prerequisites?.isEmpty() ?: true) return null
+    if (prerequisites.isEmpty()) return null
+    
+    val graph = mutableMapOf<Int,MutableList<Int>>()
+    val indegree = MutableList(numCourses,{it->0})
+        
+    prerequisites.forEach{value->
+        var src =  value[1]
+        var dest =  value [0]
+        if (graph.containsKey(src)) {
+            graph.get(src)?.add(dest) 
+        } else {
+            graph[src] = mutableListOf(dest)
+        }
+        indegree[dest] += 1
+    }
+    
+    //println(prerequisites)
+        
+    val res = mutableListOf<Int>()
+    val q = mutableListOf<Int>()
+    indegree.forEachIndexed{i,v -> 
+        if (v == 0) {
+          q.add(i)
+        }
+    }
+        
+    while (q.isNotEmpty()) {
+        var curr = q.removeAt(0)
+        res.add(curr)
+        if (graph.contains(curr)) {
+            graph.get(curr)?.forEach{v->
+                indegree[v] -= 1
+                if (indegree[v] == 0) {
+                    q.add(v)
+                }
+            }
+        }
+    }
+
+    //return number of nodes w/o cycle == total number of courses        
+    return res.size == numCourses 
+    // check there exist a cycle
+    // if graph has edge
+    //indegree.forEachIndexed{i,v -> 
+    //    if (v == 1) {
+    //        return false
+    //    }
+    //}
+    //return true
+}
+
+fun main(args: Array<String>) {
+    //Input: numCourses = 2, prerequisites = [[1,0]]
+    //Output: true
+    //Explanation: There are a total of 2 courses to take. 
+    //To take course 1 you should have finished course 0. So it is possible.
+    val numCourses = 2
+    val prerequisites = arrayOf(intArrayOf(1,0))
+    println(canFinish(numCourses, prerequisites))
+}
+
+// DFS with Tarjan Algorithm
+fun dfs(i: Int, paint: MutableList<Int>, graph: MutableList<MutableList<Int>>): Boolean {
+    //base cases 
+    //a ring
+    if (paint[i] == -1) { 
+        return false
+    }
+    //visitied
+    if (paint[i] == 1) { 
+        return true
+    }
+    //paint it as being visiting.
+    paint[i] = -1
+    //traverse i's neighbors 
+    for (j in graph[i]) {
+        //if there exist a ring.
+        if (!dfs(j, paint, graph)) {
+            return false
+        }
+    }
+    //paint as visited and jump to the next.
+    paint[i] = 1
+    return true
+}
+
+fun canFinish(numCourses: Int, prerequisites: Array<IntArray>): Boolean {
+    // convert prerequisites to a graph notation so that it can be DFS traversed
+    val graph = MutableList(numCourses) { mutableListOf<Int>() }
+    prerequisites.forEachIndexed { index, preq ->
+        // course
+        val graphIndex = preq[0]
+        // prerequisite for course
+        val prerequisite = preq[1]
+        graph[graphIndex].add(prerequisite)
+    }
+
+    //hold the paint status
+    //we initiate nodes which have not been visited, paint them as 0
+    //paint = [0 for _ in range(numCourses)]
+    val paint = MutableList(numCourses,{it->0})
+
+    //if node is being visiting, paint it as -1, if we find a node painted as -1 in dfs,then there is a ring 
+    //if node has been visited, paint it as 1
+    for (i in 0 until numCourses) {
+        // if there exist a ring.
+        if (!dfs(i, paint, graph)) {
+            return false
+        }
+    }
+    return true
+}
+
+fun main(args: Array<String>) {
+    //Input: numCourses = 2, prerequisites = [[1,0]]
+    //Output: true
+    //Explanation: There are a total of 2 courses to take. 
+    //To take course 1 you should have finished course 0. So it is possible.
+    val numCourses = 2
+    val prerequisites = arrayOf(intArrayOf(1,0))
+    println(canFinish(numCourses, prerequisites))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-417:Pacific Atlantic Water Flow](https://leetcode.com/problems/pacific-atlantic-water-flow/)
+##### Solution Explanation:
+```
+=================================================================================================================================================================
+Solution Approach:
+=================================================================================================================================================================
+In a naive approach, we would have to consider each cell and find if it is reachable to both the oceans by checking if it is able to reach - 
+1) top or left edge(atlantic) and, 
+2) bottom or right edge (pacific). This would take about O((mn)^2), which is not efficient.
+
+
+We can observe that there are these cells which can reach -
+
+ - None
+ - Pacific
+ - Atlantic
+ - Both Pacific and Atlantic
+
+We need only the cells satisfying the last condition above ( i.e., "Both Pacific and Atlantic" ).
+
+- Now, if we start from the cells connected to altantic ocean and visit all cells having height greater than current cell 
+(water can only flow from a cell to another one with height equal or lower), we are able to reach some subset of cells (let's call them A).
+
+- Next, we start from the cells connected to pacific ocean and repeat the same process, we find another subset (let's call this one B).
+
+- The final answer we get will be the intersection of sets A and B (A ∩ B).
+
+So, we just need to iterate from edge cells, find cells reachable from atlantic (set A), 
+cells reachable from pacific (set B) and return their intersection.
+
+This can be done using DFS or BFS graph traversals.
+```
+##### Complexity Analysis:
+```
+For both DFS and BFS graph traversal approaches:
+
+Time Complexity : O(M*N), in worst case, all cells are reachable to both oceans and would be visited twice. This case can occur when all elements are equal.
+Space Complexity : O(M*N), to mark the atlantic and pacific visited cells.
+```
+```python
+# Approach 1) DFS Traversal
+# ----------------------------------------
+from typing import List
+
+directions = [(1,0),(-1,0),(0,1),(0,-1)]
+
+def dfs(grid: List[List[int]], i: int, j: int, visited: List[bool], m: int, n: int) -> None:
+    # when dfs called, meaning its caller already verified this point 
+    visited[i][j] = True
+    for dir in directions:
+        x, y = i + dir[0], j + dir[1]
+        if x < 0 or x >= m or y < 0 or y >= n or visited[x][y] or grid[x][y] < grid[i][j]:
+            continue
+        dfs(grid, x, y, visited, m, n)
+
+def pacificAtlantic(heights: List[List[int]]) -> List[List[int]]:
+    if not heights: return []
+    m = len(heights)
+    n = len(heights[0])
+    p_visited = [[False for _ in range(n)] for _ in range(m)]    
+    a_visited = [[False for _ in range(n)] for _ in range(m)]
+    result = []  
+
+    for i in range(m):
+        # p_visited[i][0] = True
+        # a_visited[i][n-1] = True
+        dfs(heights, i, 0, p_visited, m, n)
+        dfs(heights, i, n-1, a_visited, m, n)
+    for j in range(n):
+        # p_visited[0][j] = True
+        # a_visited[m-1][j] = True
+        dfs(heights, 0, j, p_visited, m, n)
+        dfs(heights, m-1, j, a_visited, m, n)            
+
+    for i in range(m):
+        for j in range(n):
+            if p_visited[i][j] and a_visited[i][j]:
+                result.append([i,j])
+    return result
+
+if __name__ == "__main__":
+    #Input: heights = [[1,2,2,3,5],[3,2,3,4,4],[2,4,5,3,1],[6,7,1,4,5],[5,1,1,2,4]]
+    #Output: [[0,4],[1,3],[1,4],[2,2],[3,0],[3,1],[4,0]]
+    heights = [[1,2,2,3,5],
+               [3,2,3,4,4],
+               [2,4,5,3,1],
+               [6,7,1,4,5],
+               [5,1,1,2,4]]
+    print(pacificAtlantic(heights))
+            
+# Approach 2) BFS Traversal
+# ----------------------------------------
+from collections import deque
+from typing import List
+
+def pacificAtlantic(heights: List[List[int]]) -> List[List[int]]:
+    if not heights:
+        return []
+        
+    rows, cols = len(heights), len(heights[0])
+    p_visited, a_visited = set(), set()
+    a_queue, p_queue = [], []
+
+    def bfs(queue, visited):
+        directions = ((1,0), (-1,0), (0,1),(0,-1))
+        q = deque(queue)
+            
+        while q:
+            i,j = q.popleft()
+            if (i,j) in visited:
+                continue
+            visited.add((i,j))
+                
+            for direction in directions:
+                x, y = i + direction[0], j + direction[1]
+                if  0 <= x < rows and 0<= y < cols and heights[x][y] >= heights[i][j]:
+                    q.append((x,y))
+        
+    for i in range(rows):
+        a_queue.append((i, cols-1))
+        p_queue.append((i,0))
+            
+    for j in range(cols):
+        a_queue.append((rows-1, j))
+        p_queue.append((0,j))
+
+    bfs(a_queue, a_visited)
+    bfs(p_queue, p_visited)
+    return list(a_visited & p_visited)
+
+
+if __name__ == "__main__":
+    #Input: heights = [[1,2,2,3,5],[3,2,3,4,4],[2,4,5,3,1],[6,7,1,4,5],[5,1,1,2,4]]
+    #Output: [[0,4],[1,3],[1,4],[2,2],[3,0],[3,1],[4,0]]
+    heights = [[1,2,2,3,5],
+               [3,2,3,4,4],
+               [2,4,5,3,1],
+               [6,7,1,4,5],
+               [5,1,1,2,4]]
+    print(pacificAtlantic(heights))
+```
+```kotlin
+// Approach 1) DFS Traversal
+// ----------------------------------------
+val dirs = arrayOf(intArrayOf(0,1), 		// Right ( East  )
+                   intArrayOf(0,-1),            // Left  ( West  )
+                   intArrayOf(1,0),             // Down  ( South )
+                   intArrayOf(-1,0))            // Up    ( North )
+
+private fun dfs(grid: Array<IntArray>, height: Int, i: Int, j: Int, visited: Array<BooleanArray>) {
+    if(i < 0 || i >= grid.size || j < 0 || j >= grid[0].size || grid[i][j] < height || visited[i][j]) return
+        
+    visited[i][j] = true
+        
+    dirs.forEach { dir -> 
+        dfs(grid, grid[i][j], dir[0] + i, dir[1] + j, visited)
+    }
+}
+
+fun pacificAtlantic(heights: Array<IntArray>): List<List<Int>> {
+    if(heights.size == 0) return emptyList()
+    val result = mutableListOf<List<Int>>()
+        
+    val pacific = Array(heights.size) { BooleanArray(heights[0].size) }
+    val atlantic = Array(heights.size) { BooleanArray(heights[0].size) }
+        
+    for(i in 0 until heights.size) {
+        dfs(heights, Integer.MIN_VALUE, i, 0, pacific)
+        dfs(heights, Integer.MIN_VALUE, i, heights[0].size - 1, atlantic)
+    }
+        
+    for(i in 0 until heights[0].size) {
+        dfs(heights, Integer.MIN_VALUE, 0, i, pacific)
+        dfs(heights, Integer.MIN_VALUE, heights.size - 1, i, atlantic)
+    }
+        
+    for(i in 0 until heights.size) {
+        for(j in 0 until heights[0].size) {
+            if(atlantic[i][j] && pacific[i][j]) result.add(listOf(i, j))
+        }
+    }
+        
+    return result
+}
+
+fun main(args: Array<String>) {
+    //Input: heights = [[1,2,2,3,5],[3,2,3,4,4],[2,4,5,3,1],[6,7,1,4,5],[5,1,1,2,4]]
+    //Output: [[0,4],[1,3],[1,4],[2,2],[3,0],[3,1],[4,0]]
+    val heights = arrayOf(intArrayOf(1,2,2,3,5),
+                          intArrayOf(3,2,3,4,4),
+                          intArrayOf(2,4,5,3,1),
+                          intArrayOf(6,7,1,4,5),
+                          intArrayOf(5,1,1,2,4))
+    println(pacificAtlantic(heights))
+}
+
+// Approach 2) BFS Traversal
+import java.util.LinkedList
+
+private fun canFlow(matrix: Array<IntArray>, current: IntArray, neighbor: IntArray) =
+    matrix[current[0]][current[1]] <= matrix[neighbor[0]][neighbor[1]]
+
+private fun bfs(matrix: Array<IntArray>, queue: LinkedList<IntArray>, visited: Array<BooleanArray>, result: Array<BooleanArray>) {
+    while(!queue.isEmpty()) {
+        val current = queue.poll()
+        val x = current[0]
+        val y = current[1]
+            
+        visited[x][y] = true
+        result[x][y] = true
+            
+        val top = intArrayOf(x - 1, y)
+        if(top[0] >= 0 && !visited[top[0]][top[1]] && canFlow(matrix, current, top)) {
+            queue.offer(top)
+        }
+            
+        val bottom = intArrayOf(x + 1, y)
+        if(bottom[0] <= matrix.size - 1 && !visited[bottom[0]][bottom[1]] && canFlow(matrix, current, bottom)) {
+            queue.offer(bottom)
+        }
+            
+        val left = intArrayOf(x, y - 1)
+        if(left[1] >= 0 && !visited[left[0]][left[1]] && canFlow(matrix, current, left)) {
+            queue.offer(left)
+        }
+            
+        val right = intArrayOf(x, y + 1)
+        if(right[1] <= matrix[0].size - 1 && !visited[right[0]][right[1]] && canFlow(matrix, current, right)) {
+            queue.offer(right)
+        }
+    }
+}
+
+private fun getResult(matrix: Array<IntArray>, startEdges: List<IntArray>) : Array<BooleanArray> {
+    val queue = LinkedList(startEdges)
+    val visited = Array<BooleanArray>(matrix.size) { BooleanArray(matrix[0].size) { false } }
+    val result = Array<BooleanArray>(matrix.size) { BooleanArray(matrix[0].size) { false } }
+    bfs(matrix, queue, visited, result)
+    return result
+}
+    
+private fun pacificEdges(matrix: Array<IntArray>) : List<IntArray> {
+    val result = mutableListOf<IntArray>()
+    (0 until matrix.size).forEach { result.add(intArrayOf(it, 0)) }
+    (0 until matrix[0].size).forEach { result.add(intArrayOf(0, it)) }
+    return result
+}
+    
+private fun atlanticEdges(matrix: Array<IntArray>) : List<IntArray> {
+    val result = mutableListOf<IntArray>()
+    (0 until matrix.size).forEach { result.add(intArrayOf(it, matrix[0].size - 1)) }
+    (0 until matrix[0].size).forEach { result.add(intArrayOf(matrix.size - 1, it)) }
+    return result
+}
+
+fun pacificAtlantic(heights: Array<IntArray>): List<List<Int>> {
+    //val result = mutableListOf<IntArray>()
+    val result = mutableListOf<List<Int>>()
+    if(heights.isEmpty()) return result
+        
+    val pacificResult = getResult(heights, pacificEdges(heights))
+    val atlanticResult = getResult(heights, atlanticEdges(heights))
+        
+    (0 until heights.size).forEach { x ->
+        (0 until heights[0].size).forEach { y ->
+            if(pacificResult[x][y] && atlanticResult[x][y]) {
+                //result.add(intArrayOf(x, y))
+                result.add(listOf(x, y))
+            }
+        }
+    }
+        
+    return result
+}
+
+fun main(args: Array<String>) {
+    //Input: heights = [[1,2,2,3,5],[3,2,3,4,4],[2,4,5,3,1],[6,7,1,4,5],[5,1,1,2,4]]
+    //Output: [[0,4],[1,3],[1,4],[2,2],[3,0],[3,1],[4,0]]
+    val heights = arrayOf(intArrayOf(1,2,2,3,5),
+                          intArrayOf(3,2,3,4,4),
+                          intArrayOf(2,4,5,3,1),
+                          intArrayOf(6,7,1,4,5),
+                          intArrayOf(5,1,1,2,4))
+    println(pacificAtlantic(heights))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-200:Number of Islands](https://leetcode.com/problems/number-of-islands/)
+##### Solution Explanation:
+```
+Solution Approach:
+DFS ( Recursion )
+=================================================================================================================================================================
+1. Scan grid - nested for loop
+2. If cell = 1, piece of land -> pass into recursive dfs and consume/drown the land
+3. Increment counter
+4. Pass grid into recursive - state of grid changes - to avoid double counting
+
+References:
+-------------
+https://www.youtube.com/watch?v=o8S2bO3pmO4
+```
+##### Complexity Analysis:
+```
+Time Complexity   : O(M*N)
+Space Complexity  : O(M*N)
+```
+```python
+# DFS (Recursion)
+from typing import List
+import unittest
+
+class Solution:
+
+    def numIslands(self, grid: List[List[str]]) -> int:
+        def searchAndSink(rowIndex: int, columnIndex: int) -> None:
+            if rowIndex >= len(grid) or rowIndex < 0 or columnIndex >= len(grid[0]) or columnIndex < 0:
+                return
+            
+            if (grid[rowIndex][columnIndex] == '1'):
+                grid[rowIndex][columnIndex] = 0 
+                searchAndSink(rowIndex - 1, columnIndex)
+                searchAndSink(rowIndex + 1, columnIndex)
+                searchAndSink(rowIndex, columnIndex - 1)
+                searchAndSink(rowIndex, columnIndex + 1)
+        count = 0
+        for rowIndex in range(len(grid)):
+            for columnIndex in range(len(grid[0])):
+                if grid[rowIndex][columnIndex] == '1':
+                    count += 1
+                    searchAndSink(rowIndex, columnIndex)
+        return count
+
+class Test(unittest.TestCase):
+    def setUp(self) -> None:
+        pass
+
+    def tearDown(self) -> None:
+        pass
+
+    def test_numIslands(self) -> None:
+        sol = Solution()
+        for grid, solution in (
+            [
+                [
+                    ["1", "1", "1", "1", "0"],
+                    ["1", "1", "0", "1", "0"],
+                    ["1", "1", "0", "0", "0"],
+                    ["0", "0", "0", "0", "0"],
+                ],
+                1,
+            ],
+            [
+                [
+                    ["1", "1", "0", "0", "0"],
+                    ["1", "1", "0", "0", "0"],
+                    ["0", "0", "1", "0", "0"],
+                    ["0", "0", "0", "1", "1"],
+                ],
+                3,
+            ],
+        ):
+            self.assertEqual(
+                solution,
+                sol.numIslands(grid),
+                "Should determine the number of islands",
+            )
+
+if __name__ == "__main__":
+    ##Input: grid = [
+    ##["1","1","1","1","0"],
+    ##["1","1","0","1","0"],
+    ##["1","1","0","0","0"],
+    ##["0","0","0","0","0"]
+    ##]
+    ##Output: 1
+    #grid = [
+    #["1","1","1","1","0"],
+    #["1","1","0","1","0"],
+    #["1","1","0","0","0"],
+    #["0","0","0","0","0"]
+    #]
+    #print(numIslands(grid))
+	unittest.main()
+
+### Other Solutions
+## 1) Union Find
+## 2) BFS
+
+# 1) Union Find
+# Time:  O(m * n * α(m * n)) ~= O(m * n)
+# Space: O(m * n)
+
+class UnionFind(object):
+    def __init__(self, n):
+        self.set = range(n)
+        self.count = n
+
+    def find_set(self, x):
+       if self.set[x] != x:
+           self.set[x] = self.find_set(self.set[x])  # path compression.
+       return self.set[x]
+
+    def union_set(self, x, y):
+        x_root, y_root = map(self.find_set, (x, y))
+        if x_root != y_root:
+            self.set[min(x_root, y_root)] = max(x_root, y_root)
+            self.count -= 1
+
+
+class Solution(object):
+    def numIslands(self, grid):
+        """
+        :type grid: List[List[str]]
+        :rtype: int
+        """
+        def index(n, i, j):
+            return i*n + j
+    
+        if not grid:
+            return 0
+
+        zero_count = 0
+        union_find = UnionFind(len(grid)*len(grid[0]))
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
+                if grid[i][j] == '1':
+                    if i and grid[i-1][j] == '1':
+                        union_find.union_set(index(len(grid[0]), i-1, j),
+                                             index(len(grid[0]),i, j))
+                    if j and grid[i][j-1] == '1':
+                        union_find.union_set(index(len(grid[0]), i, j-1),
+                                             index(len(grid[0]), i, j))
+                else:
+                    zero_count += 1        
+        return union_find.count-zero_count
+
+# 2) BFS
+# Time:  O(m * n)
+# Space: O(m * n)
+import collections
+
+
+# bfs solution
+class Solution3(object):
+    def numIslands(self, grid):
+        """
+        :type grid: List[List[str]]
+        :rtype: int
+        """
+        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+        def bfs(grid, i, j):
+            if grid[i][j] == '0':
+                return False
+            grid[i][j] ='0'
+            q = collections.deque([(i, j)])
+            while q:
+                r, c = q.popleft()
+                for dr, dc in directions:
+                    nr, nc = r+dr, c+dc
+                    if not (0 <= nr < len(grid) and
+                            0 <= nc < len(grid[0]) and
+                            grid[nr][nc] == '1'):
+                        continue
+                    grid[nr][nc] = '0'
+                    q.append((nr, nc))
+            return True
+
+        count = 0
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
+                if bfs(grid, i, j):
+                    count += 1
+        return count
+```
+```kotlin
+private var gridHeight: Int = 0
+private var gridWidth: Int = 0
+
+/**
+ * will recursively traverse an island by visiting all of its connecting neighbors and sinking its connecting pieces of land
+ * so islands will not be searched again
+ */
+private fun sink(grid: Array<CharArray>, rowIndex: Int, columnIndex: Int) {
+    //check that recursive calls do not traverse outside the grid or the current space itself is not water
+    if (rowIndex < 0 || columnIndex < 0 || rowIndex >= gridHeight || columnIndex >= gridWidth || grid[rowIndex][columnIndex] != '1') return
+    grid[rowIndex][columnIndex] = '0'   //change the currently traversed piece of land to water 
+        
+    //traverse both spots horizontally and vertically from this current space
+    sink(grid, rowIndex + 1, columnIndex)
+    sink(grid, rowIndex - 1, columnIndex)
+    sink(grid, rowIndex, columnIndex + 1)
+    sink(grid, rowIndex, columnIndex - 1)
+}
+
+fun numIslands(grid: Array<CharArray>): Int {
+    var count = 0
+    gridHeight = grid.size
+    if (gridHeight == 0) return 0   //check that there is a height of 1 at least to avoid index out of bounds
+    gridWidth = grid[0].size   
+    grid.forEachIndexed { rowIndex, rowArray -> 
+        rowArray.forEachIndexed { columnIndex, char ->  
+            if (char == '1') {    //if current char is land, then we know we can start sinking neighboring islands as we traverse each spot
+                sink(grid, rowIndex, columnIndex) 
+                count++    //we know there is at least one island after searching so increment count
+            }
+        }
+    }
+    return count
+}
+
+fun main(args: Array<String>) {
+    //Input: grid = [
+    //["1","1","1","1","0"],
+    //["1","1","0","1","0"],
+    //["1","1","0","0","0"],
+    //["0","0","0","0","0"]
+    //]
+    //Output: 1
+    val grid = arrayOf(charArrayOf('1','1','1','1','0'),
+                       charArrayOf('1','1','0','1','0'),
+                       charArrayOf('1','1','0','0','0'),
+                       charArrayOf('0','0','0','0','0'))
+    println(numIslands(grid))
+}
+
+//=================================================================================================================================================================
+//Idiomatic Kotlin
+//------------------
+//With extension properties and compile time constants to make the solution more readable.
+//=================================================================================================================================================================
+class Solution {
+
+    companion object {
+        private const val LAND: Char = '1'
+        private const val WATER: Char = '0'
+    }
+
+    private val Char.isLand: Boolean
+        get() = this == LAND
+
+
+    private val Char.isWater: Boolean
+        get() = this == WATER
+
+    private var gridHeight: Int = 0
+    private var gridWidth: Int = 0
+
+    fun numIslands(grid: Array<CharArray>): Int {
+        var count = 0
+        gridHeight = grid.size
+        if (gridHeight == 0) return 0   //check that there is a height of 1 at least to avoid index out of bounds
+        gridWidth = grid[0].size
+        grid.forEachIndexed { rowIndex, rowArray ->
+            rowArray.forEachIndexed { columnIndex, char ->
+                if (char.isLand) {    //if current char is land, then we know we can start sinking neighboring islands as we traverse each spot
+                    sink(grid, rowIndex, columnIndex)
+                    count++     //we know there is at least one island after searching so increment count
+                }
+            }
+        }
+        return count
+    }
+
+    /**
+     * will recursively traverse an island by visiting all of its connecting neighbors and sinking its connecting pieces of land
+     * so islands will not be searched again
+     */
+    private fun sink(grid: Array<CharArray>, rowIndex: Int, columnIndex: Int) {
+        //check that recursive calls do not traverse outside the grid or the current space itself is water
+        if (rowIndex < 0 || columnIndex < 0 || rowIndex >= gridHeight || columnIndex >= gridWidth || grid[rowIndex][columnIndex].isWater) return
+        grid[rowIndex][columnIndex] = WATER   //change the currently traversed piece of land to water
+
+        //traverse both spots horizontally and vertically from this current space
+        sink(grid, rowIndex + 1, columnIndex)
+        sink(grid, rowIndex - 1, columnIndex)
+        sink(grid, rowIndex, columnIndex + 1)
+        sink(grid, rowIndex, columnIndex - 1)
+    }
+
+}
+
+fun main(args: Array<String>) {
+    //Input: grid = [
+    //["1","1","1","1","0"],
+    //["1","1","0","1","0"],
+    //["1","1","0","0","0"],
+    //["0","0","0","0","0"]
+    //]
+    //Output: 1
+    val solution = Solution()
+    val grid = arrayOf(charArrayOf('1','1','1','1','0'),
+                       charArrayOf('1','1','0','1','0'),
+                       charArrayOf('1','1','0','0','0'),
+                       charArrayOf('0','0','0','0','0'))
+    println(solution.numIslands(grid))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-128:Longest Consecutive Sequence](https://leetcode.com/problems/longest-consecutive-sequence/)
+##### Solution Explanation:
+```
+=================================================================================================================================================================
+Solution Approach:
+=================================================================================================================================================================
+DFS
+
+We can think this is a undirectional graph: every number i is connected with its two adjacent numbers i-1, i+1.
+So that we can start from a number in the input (convert input to be a set so that look up a number whether in the set has O(1) complexity),
+use DFS to traverse the whole graph.
+
+Visited numbers are removed from the set so that we don't revisit one number twice.
+```
+##### Complexity Analysis:
+```
+Time Complexity   : O(N)
+Space Complexity  : O(N)
+```
+```python
+from typing import List, Set
+
+def dfs(numSet: Set[int], root: int, size: List[int]):
+    if root-1 in numSet:
+        size[0]+= 1
+        numSet.remove(root-1) #mark it as visited when check the neighbor
+        dfs(numSet, root-1, size)
+    if root+1 in numSet:
+        size[0]+= 1
+        numSet.remove(root+1)
+        dfs(numSet, root+1, size)
+
+def longestConsecutive(nums: List[int]) -> int:
+    if not nums:
+        return 0
+        
+    numSet = set(nums)
+    max_length = 1
+    while numSet:
+        size=[1]
+        current= numSet.pop()
+        dfs(numSet, current, size)
+        max_length= max(max_length, size[0])
+    return max_length
+
+if __name__ == "__main__":
+    #Input: nums = [100,4,200,1,3,2]
+    #Output: 4
+    #Explanation: The longest consecutive elements sequence is [1, 2, 3, 4]. Therefore its length is 4.
+    nums = [100,4,200,1,3,2]
+    print(longestConsecutive(nums))
+```
+```kotlin
+fun <T> MutableSet<T>.pop(): T? = this.first().also{this.remove(it)}
+
+fun dfs(numSet: MutableSet<Int>, root: Int, size: IntArray) {
+    if (root-1 in numSet) {
+        size[0] += 1
+        numSet.remove(root-1) //mark it as visited when check the neighbor
+        dfs(numSet, root-1, size)
+    }
+    if (root+1 in numSet) {
+        size[0] += 1
+        numSet.remove(root+1)
+        dfs(numSet, root+1, size)
+    }
+}
+
+fun longestConsecutive(nums: IntArray): Int {
+    if (nums.isEmpty()) return 0
+        
+    val numSet = nums.toMutableSet()
+    var maxLength = 1
+
+    while (!numSet.isEmpty()) {
+        val size = intArrayOf(1)
+        val current = numSet.pop()
+        dfs(numSet, current!!, size)
+        maxLength= maxOf(maxLength, size[0])
+    }
+    return maxLength       
+}
+
+fun main(args: Array<String>) {
+    //Input: nums = [100,4,200,1,3,2]
+    //Output: 4
+    //Explanation: The longest consecutive elements sequence is [1, 2, 3, 4]. Therefore its length is 4.
+    val nums = intArrayOf(100,4,200,1,3,2)
+    println(longestConsecutive(nums))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-269:Alien Dictionary](https://leetcode.com/problems/alien-dictionary/)
+##### Solution Explanation:
+```
+BFS
+
+------------------------
+Thought process:
+------------------------
+Topological sort:
+------------------------
+Topological sort:
+1. Build graph: 
+   1.1 a map of character -> set of character.
+   1.2 Also get in-degrees for each character. In-degrees will be a map of character -> integer.
+2. Topological sort:
+   2.1 Loop through in-degrees. Offer the characters with in-degree of 0 to queue.
+   2.2 While queue is not empty:
+       2.2.1 Poll from queue. Append to character to result string.
+       2.2.2 Decrease the in-degree of polled character's children by 1.
+       2.2.3 If any child's in-degree decreases to 0, offer it to queue.
+3. At last, if result string's length is less than the number of vertices, that means there is a cycle in my graph. The order is invalid.
+```
+##### Complexity Analysis:
+```
+Time Complexity   : O(N)
+
+- Say the number of characters in the dictionary (including duplicates) is N.
+- Building the graph takes O(N).
+- Topological sort takes O(V + E). V <= N.
+- E also can't be larger than N.
+- So the overall time complexity is O(n).
+                  
+Space Complexity  : O(N)
+```
+```python
+# BFS Solution
+# -----------------------------------
+from typing import List
+
+# Construct the graph.
+def findEdges(word1, word2, in_degree, out_degree):
+    str_len = min(len(word1), len(word2))
+    for i in range(str_len):
+        if word1[i] != word2[i]:
+            if word2[i] not in in_degree:
+                in_degree[word2[i]] = set()
+            if word1[i] not in out_degree:
+                out_degree[word1[i]] = set()
+            in_degree[word2[i]].add(word1[i])
+            out_degree[word1[i]].add(word2[i])
+            break
+
+def alienOrder(words: List[str]) -> str:
+    result, in_degree, out_degree = [], {}, {}
+    zero_in_degree_queue = collections.deque()
+    nodes = set()
+    for word in words:
+        for c in word:
+            nodes.add(c)
+
+    for i in range(1, len(words)):
+        if (len(words[i-1]) > len(words[i]) and
+                words[i-1][:len(words[i])] == words[i]):
+            return ""
+        findEdges(words[i - 1], words[i], in_degree, out_degree)
+
+    for node in nodes:
+        if node not in in_degree:
+            zero_in_degree_queue.append(node)
+
+    while zero_in_degree_queue:
+        precedence = zero_in_degree_queue.popleft()
+        result.append(precedence)
+
+        if precedence in out_degree:
+            for c in out_degree[precedence]:
+                in_degree[c].discard(precedence)
+                if not in_degree[c]:
+                    zero_in_degree_queue.append(c)
+
+            del out_degree[precedence]
+
+    if out_degree:
+        return ""
+
+    return "".join(result)
+
+# DFS solution.
+# -----------------------------------
+from typing import List
+
+# Construct the graph.
+def findEdges(word1, word2, ancestors):
+    min_len = min(len(word1), len(word2))
+    for i in range(min_len):
+        if word1[i] != word2[i]:
+            ancestors[word2[i]].append(word1[i])
+            break
+
+# Topological sort, return whether there is a cycle.
+def topSortDFS(root, node, ancestors, visited, result):
+    if node not in visited:
+        visited[node] = root
+        for ancestor in ancestors[node]:
+            if topSortDFS(root, ancestor, ancestors, visited, result):
+                return True
+        result.append(node)
+    elif visited[node] == root:
+        # Visited from the same root in the DFS path.
+        # So it is cyclic.
+        return True
+    return False
+
+def alienOrder(words: List[str]) -> str:
+    # Find ancestors of each node by DFS.
+    nodes, ancestors = set(), {}
+    for i in range(len(words)):
+        for c in words[i]:
+            nodes.add(c)
+    for node in nodes:
+        ancestors[node] = []
+    for i in range(1, len(words)):
+        if (len(words[i-1]) > len(words[i]) and
+                words[i-1][:len(words[i])] == words[i]):
+            return ""
+        findEdges(words[i - 1], words[i], ancestors)
+
+    # Output topological order by DFS.
+    result = []
+    visited = {}
+    for node in nodes:
+        if topSortDFS(node, node, ancestors, visited, result):
+            return ""
+
+    return "".join(result)
+```
+```kotlin
+// BFS Solution
+// -----------------------------------
+class MyDeque<T> {
+
+    var backingList: MutableList<T> = arrayListOf()
+
+    fun addFirst(element: T) {
+        backingList.add(0, element)
+    }
+
+    fun getFirst(): T? {
+        if (backingList.isEmpty()) {
+            return null
+        }
+        val value = backingList.first()
+        removeFirst()
+        return value
+    }
+
+    fun removeFirst() {
+        if (backingList.isNotEmpty()) backingList.removeAt(0)
+    }
+
+    fun peekFirst(): T? {
+        return if (backingList.isNotEmpty()) backingList.first() else null
+    }
+
+    fun addLast(element: T) {
+        backingList.add(element)
+    }
+
+    fun getLast(): T? {
+        if (backingList.isEmpty()) {
+            return null
+        }
+        val value = backingList.last()
+        removeLast()
+        return value
+    }
+
+    fun removeLast() {
+        if (backingList.isNotEmpty()) backingList.removeAt(backingList.size - 1)
+    }
+
+    fun peekLast(): T? {
+        return if (backingList.isNotEmpty()) backingList.last() else null
+    }
+}
+
+// topological sort or return empty if cycle detected
+// T:O(n) S:O(|V|+|E|)=O(26+26^2)=O(1)
+
+// BFS
+fun findEdgesBFS(word1: String, word2: String, inDegree: HashMap<Char, HashSet<Char>>, outDegree: HashMap<Char, HashSet<Char>>) {
+    val len = minOf(word1.length, word2.length)
+    for (i in 0..len - 1) {
+        if (word1[i] != word2[i]) {
+            if (word2[i] !in inDegree) {
+                inDegree.put(word2[i], hashSetOf())
+            }
+            if (word1[i] !in outDegree) {
+                outDegree.put(word1[i], hashSetOf())
+            }
+            inDegree[word2[i]]?.add(word1[i])
+            outDegree[word1[i]]?.add(word2[i])
+            break
+        }
+    }
+}
+
+fun getAlienDictionaryOrderBFS(words: List<String>): String {
+    val ret = StringBuilder()
+
+    // we see a char as a node
+    val zeroInDegreeDq = MyDeque<Char>()
+    // key is entered from values
+    val inDegree = hashMapOf<Char, HashSet<Char>>()
+    // key enters to values
+    val outDegree = hashMapOf<Char, HashSet<Char>>()
+    val nodes = hashSetOf<Char>()
+
+    // get all chars
+    words.forEach({ it.forEach { nodes.add(it) } })
+
+    // build graph
+    for (i in 1..words.size - 1) {
+        if (words[i - 1].length > words[i].length
+                && words[i - 1].substring(0..words[i].length - 1) == words[i])
+            return ""
+        findEdgesBFS(words[i - 1], words[i], inDegree, outDegree)
+    }
+
+    // get 0 in degree nodes to start with
+    nodes.filter { it !in inDegree }.forEach({ zeroInDegreeDq.addFirst(it) })
+
+    var precedence: Char
+    while (zeroInDegreeDq.peekFirst() != null) {
+        precedence = zeroInDegreeDq.getLast()!!
+        ret.append(precedence)
+
+        if (precedence in outDegree) {
+            for (c in outDegree[precedence]!!) {
+                inDegree[c]?.remove(precedence)
+                if (inDegree[c]!!.isEmpty())
+                    zeroInDegreeDq.addFirst(c)
+            }
+            outDegree.remove(precedence)
+        }
+    }
+    if (outDegree.isNotEmpty())
+        return ""
+    return ret.toString()
+}
+
+// DFS Solution
+// -----------------------------------
+fun getAlienDictionaryOrderDFS(words: List<String>): String {
+    val nodes = hashSetOf<Char>()
+    val ancestors = hashMapOf<Char, ArrayList<Char>>()
+    words.forEach { it.forEach { nodes.add(it) } }
+    for (node in nodes)
+        ancestors.put(node, arrayListOf())
+    for (i in 1..words.size - 1) {
+        if (words[i - 1].length > words[i].length && words[i - 1].substring(0..words[i].length - 1) == words[i])
+            return ""
+        findEdgesDFS(words[i - 1], words[i], ancestors)
+    }
+    val sb = StringBuilder()
+    val visited = hashMapOf<Char, Char>()
+    if (nodes.any { topSortDFS(it, it, ancestors, visited, sb) })
+        return ""
+
+    return sb.toString()
+}
+
+fun findEdgesDFS(word1: String, word2: String, ancestors: HashMap<Char, ArrayList<Char>>) {
+    val minLen = minOf(word1.length, word2.length)
+    for (i in 0..minLen - 1)
+        if (word1[i] != word2[i]) {
+            ancestors[word2[i]]?.add(word1[i])
+            break
+        }
+}
+
+fun topSortDFS(root: Char, node: Char, ancestors: HashMap<Char, ArrayList<Char>>, visited: HashMap<Char, Char>, sb: StringBuilder): Boolean {
+    if (node !in visited) {
+        visited.put(node, root)
+        ancestors[node]?.any { topSortDFS(root, it, ancestors, visited, sb) }?.let {
+            if (it)
+                return it
+        }
+        sb.append(node)
+    } else if (visited[node] == root) {
+        return true
+    }
+    return false
+}
+
+fun main(args: Array<String>) {
+    val words = arrayListOf(
+            "wrt",
+            "wrf",
+            "er",
+            "ett",
+            "rftt"
+    )
+    println(getAlienDictionaryOrderBFS(words))
+    println(getAlienDictionaryOrderDFS(words))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-261:Graph Valid Tree](https://leetcode.com/problems/graph-valid-tree/)
+##### Solution Explanation:
+```
+DFS
+
+A tree is a special undirected graph. It satisfy two properties :
+1. It is connected
+2. It has no cycle.
+
+Being connected means you can start from any node and reach any other node. 
+- To prove it, we can do a DFS and add each node we visit to a set. 
+- After we visited all the nodes, we compare the number of nodes in the set with the total number of nodes. 
+- If they are the same then every node is accessible from any other node and the graph is connected.
+
+To prove an undirected graph having no cycle, we can also do a DFS.
+- If a graph contains a cycle, then we would visit a certain node more than once.
+- There is a minor caveat, since the graph is undirected, when we visit a child we would always add parent to the next visit list. 
+- This creates a trivial cycle and not the real cycle we want.
+- We can avoid detecting trivial cycle but adding an additional parent state in the DFS call.
+
+We can check both properties in one DFS call since cycle detection always keeps track of a visited set.
+```
+##### Complexity Analysis:
+```
+Time complexity: O(V + E)
+Space Complexity  : O(V + E)
+```
+```python
+from collections import defaultdict
+from typing import List
+
+def validTree(self, n: int, edges: List[List[int]]) -> bool:
+    graph = defaultdict(list)
+        
+    # build the graph
+    for src, dest in edges:
+        graph[src].append(dest)
+        graph[dest].append(src)
+            
+    visited = set()
+    def dfs(root, parent): # returns true if graph has no cycle
+        visited.add(root)
+        for node in graph[root]:
+            if node == parent: # trivial cycle, skip
+                continue
+            if node in visited:
+                return False
+            
+            if not dfs(node, root):
+                return False
+        return True
+        
+    return dfs(0, -1) and len(visited) == n
+
+if __name__ == "__main__":
+    #Input: n = 5, and edges = [[0,1], [0,2], [0,3], [1,4]]
+    #Output: true
+    n = 5
+    edges = [[0,1], [0,2], [0,3], [1,4]]
+    print(validTree(n, edges))
+```
+```kotlin
+import java.util.HashMap
+import java.util.HashSet
+
+private fun hasCycle(node: Int, parent: Int, graph: HashMap<Int, HashSet<Int>>, visited: HashSet<Int>): Boolean {
+    visited.add(node)
+    for (neighbor in graph[node]!!) {
+        if (neighbor != parent && visited.contains(neighbor)) {
+            return true
+        }
+        if (!visited.contains(neighbor) && hasCycle(neighbor, node, graph, visited)) {
+            return true
+        }
+    }
+    return false
+}
+
+fun validTree(n: Int, edges: Array<IntArray>): Boolean {
+    if (edges.isEmpty()) {
+        return n == 1
+    }
+    if (n != edges.size + 1) {
+        return false
+    }
+    val graph = HashMap<Int, HashSet<Int>>()
+    for (i in 0 until n) {
+        graph.put(i, HashSet<Int>())
+    }
+    for (edge in edges) {
+        graph[edge[0]]!!.add(edge[1])
+        graph[edge[1]]!!.add(edge[0])
+    }
+    val visited = HashSet<Int>()
+    //if (hasCycle(0, -1, graph, visited)) {
+    //    return false
+    //}
+    //return visited.size === n
+    return !hasCycle(0, -1, graph, visited) and (visited.size === n)
+}
+
+fun main(args: Array<String>) {
+    //Input: n = 5, and edges = [[0,1], [0,2], [0,3], [1,4]]
+    //Output: true
+    val n = 5
+    val edges = arrayOf(intArrayOf(0,1),
+                        intArrayOf(0,2),
+                        intArrayOf(0,3),
+                        intArrayOf(1,4))
+    println(validTree(n, edges))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-323:Number of Connected Components in an Undirected Graph](https://leetcode.com/problems/number-of-connected-components-in-an-undirected-graph/)
+##### Solution Explanation:
+```
+BFS
+---------
+- Start from index 0 to n.
+- For each index : 
+  - use BFS to find all it’s related numbers
+  - append them to the visited set
+  - if this index has no more related numbers then increment count ( count = count + 1 )
+    and 
+  - start from next index
+  - note that if the index is in visited set. we skip to next index
+
+```
+##### Complexity Analysis:
+```
+Time complexity: O(2N)
+
+Build graph will take O(N) and traversal all number will take O(N). In total is O(2N) where N is the given as the size of the index.
+
+Space Complexity  : O(N)
+```
+```python
+#BFS
+from collections import defaultdict, deque
+from typing import List
+
+def countComponents(n: int, edges: List[List[int]]) -> int:
+    dist = defaultdict(list)
+    for source, target in edges:
+        dist[source].append(target)
+        dist[target].append(source)
+    count = 0
+    visited = set()
+    queue = deque()
+    for x in range(n):
+        if x in visited:
+            continue
+        queue.append(x)
+        while queue:
+            source=queue.popleft()
+            if source in visited:
+                continue
+            visited.add(source)
+            for target in dist[source]:
+                queue.append(target)
+        count+=1
+    return count
+```
+```kotlin
+fun countComponents(n: Int, edges: Array<IntArray>): Int {
+    val dist = mutableMapOf<Int, MutableList<Int>>()
+    edges.forEach{value->
+        var source = value[0]
+        var target = value[1]
+        dist.get(source)?.add(target) 
+        dist.get(target)?.add(source) 
+    }
+    var count = 0
+    val visited = mutableSetOf<Int>()
+    val queue = mutableListOf<Int>()
+    for (x in 0 until n) {
+        if (visited.contains(x)) continue
+        queue.add(x)
+        while (queue.isNotEmpty()) {
+            val source = queue.removeAt(0)
+            if (visited.contains(source)) continue
+            visited.add(source)
+            dist.get(source)?.forEach{v->
+                queue.add(v)
+            }
+        }
+        count++
+    }
+    return count
+}
+
+fun main(args: Array<String>) {
+    //Input: n = 5 and edges = [[0, 1], [1, 2], [3, 4]]
+    //
+    //0          3
+    //|          |
+    //1 --- 2    4 
+    //
+    //Output: 2
+    val n = 5
+    val edges = arrayOf(intArrayOf(0,1),
+                        intArrayOf(1,2),
+                        intArrayOf(3,4))
+    println(countComponents(n, edges))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
 ## String
 | #     | Title	                                         | url                                                                           | Time   | Space   | Difficulty | Tag	        | Note                   |
 | ----- | ---------------------------------------------- | ----------------------------------------------------------------------------- | ------ | ------- | ---------- | ------------ | ---------------------- |
