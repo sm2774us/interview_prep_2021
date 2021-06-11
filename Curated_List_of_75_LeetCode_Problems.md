@@ -6395,6 +6395,413 @@ fun main(args: Array<String>) {
 </div>
 <br/>
 
+## Interval
+| #     | Title	                                         | url                                                                           | Time   | Space   | Difficulty | Tag	        | Note                   |
+| ----- | ---------------------------------------------- | ----------------------------------------------------------------------------- | ------ | ------- | ---------- | ------------ | ---------------------- |
+| 0057  | [Insert Interval](#lc-57insert-interval) | https://leetcode.com/problems/insert-interval/                                | O(n)   | O(1)    | Hard       |              |                        |
+| 0056  | [Merge Intervals](#lc-56merge-intervals) | https://leetcode.com/problems/merge-intervals/                                | O(nlogn) | O(1)  | Hard       |              |                        |
+| 0435  | [Non-overlapping Intervals](#lc-435non-overlapping-intervals) | https://leetcode.com/problems/non-overlapping-intervals/                      | O(nlogn) | O(1)  | Medium     |              | Line Sweep             |
+| 0252  | [Meeting Rooms](#lc-252meeting-rooms) | https://leetcode.com/problems/meeting-rooms/                                  | O(nlogn) | O(n)  | Easy       | 🔒           |                        |
+| 0253  | [Meeting Rooms II](#lc-253meeting-rooms-ii) | https://leetcode.com/problems/meeting-rooms-ii/)                              | O(nlogn) | O(n)  | Medium     | 🔒           |                        |
+
+#### [LC-57:Insert Interval](https://leetcode.com/problems/insert-interval/)
+##### Solution Explanation:
+```
+=================================================================================================================================================================
+Solution Approach:
+=================================================================================================================================================================
+the main idea is that when iterating over the intervals there are three cases:
+
+1. the new interval is in the range of the other interval
+2. the new interval's range is before the other
+3. the new interval is after the range of other interval
+```
+##### Complexity Analysis:
+```
+TC: O(N)
+SC: O(N)
+```
+```python
+from typing import List
+
+def insert(intervals: List[List[int]], newInterval: List[int]) -> List[List[int]]:
+    result = []
+
+    for interval in intervals:
+        # the new interval is after the range of other interval, so we can leave the current interval baecause the new one does not overlap with it
+        if interval[1] < newInterval[0]:
+            result.append(interval)
+        # the new interval's range is before the other, so we can add the new interval and update it to the current one
+        elif interval[0] > newInterval[1]:
+            result.append(newInterval)
+            newInterval = interval
+        # the new interval is in the range of the other interval, we have an overlap, so we must choose the min for start and max for end of interval 
+        elif interval[1] >= newInterval[0] or interval[0] <= newInterval[1]:
+            newInterval[0] = min(interval[0], newInterval[0])
+            newInterval[1] = max(newInterval[1], interval[1])
+        
+    result.append(newInterval); 
+    return result
+
+
+if __name__ == "__main__":
+    #Input: intervals = [[1,3],[6,9]], newInterval = [2,5]
+    #Output: [[1,5],[6,9]]
+    n = 5
+    intervals = [[1,3],[6,9]]
+    val newInterval = [2,5]
+    print(insert(intervals, newInterval))
+```
+```kotlin
+fun insert(intervals: Array<IntArray>, newInterval: IntArray): Array<IntArray> {
+    val result : MutableList<Interval> = ArrayList()
+    if (newInterval == null) {
+        return result
+    }
+    var lastInterval : Interval = newInterval
+    for (interval: Interval in intervals) {
+        if (interval.end < lastInterval.start) {
+            result.add(interval)
+        } else if (interval.start > lastInterval.end) {
+            result.add(lastInterval)
+            lastInterval = interval
+        } else if (interval.end >= lastInterval.start || interval.start <= lastInterval.start) {
+            val nstart: Int = Math.min(interval.start, lastInterval.start)
+            val nend: Int = Math.max(interval.end, lastInterval.end)
+            val nInterval: Interval = Interval(nstart, nend)
+            lastInterval = nInterval
+        }
+    }
+    result.add(lastInterval)
+    return result    
+}
+
+fun main(args: Array<String>) {
+    //Input: intervals = [[1,3],[6,9]], newInterval = [2,5]
+    //Output: [[1,5],[6,9]]
+    val n = 5
+    val intervals = arrayOf(intArrayOf(1,3),
+                            intArrayOf(6,9))
+    val newInterval = arrayOf(intArrayOf(2,5))
+    println(insert(intervals, newInterval))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-56:Merge Intervals](https://leetcode.com/problems/merge-intervals/)
+##### Solution Explanation:
+```
+=================================================================================================================================================================
+Solution Approach:
+=================================================================================================================================================================
+- if the list of merged intervals is empty 
+  or if the current interval does not overlap with the previous,
+  - simply append it.
+- otherwise, there is overlap,
+  - so we merge the current and previous intervals.
+```
+##### Complexity Analysis:
+```
+TC: O(N*log(N))
+----------------
+In python, use sort method to a list costs O(nlogn), where n is the length of the list.
+The for-loop used to merge intervals, costs O(n).
+O(nlogn)+O(n) = O(nlogn)
+So the total time complexity is O(nlogn).
+
+SC: O(N)
+---------------
+The algorithm used a merged list and a variable i.
+In the worst case, the merged list is equal to the length of the input intervals list. So the space complexity is O(n), where n is the length of the input list.
+```
+```python
+from typing import List
+
+def merge(intervals: List[List[int]]) -> List[List[int]]:
+    intervals.sort(key =lambda x: x[0])
+    merged =[]
+    for i in intervals:
+        # if the list of merged intervals is empty 
+        # or if the current interval does not overlap with the previous,
+        # simply append it.
+        if not merged or merged[-1][-1] < i[0]:
+            merged.append(i)
+        # otherwise, there is overlap,
+        #so we merge the current and previous intervals.
+        else:
+            merged[-1][-1] = max(merged[-1][-1], i[-1])
+    return merged
+
+if __name__ == "__main__":
+    #Input: intervals = [[1,3],[2,6],[8,10],[15,18]]
+    #Output: [[1,6],[8,10],[15,18]]
+    #Explanation: Since intervals [1,3] and [2,6] overlaps, merge them into [1,6].
+    intervals = [[1,3],[2,6],[8,10],[15,18]]
+    print(merge(intervals))
+```
+```kotlin
+fun merge(intervals: Array<IntArray>): Array<IntArray> {
+    intervals.sortWith(compareBy({it[0]}, {-it[1]}))
+        
+    var merged = LinkedList<IntArray>()
+    for ((start, end) in intervals){
+        if(merged.isEmpty() || merged.last()[1] < start)
+            merged.add(intArrayOf(start, end))
+        else
+            merged.last()[1] = maxOf(merged.last()[1], end)
+    }
+        
+    return merged.toTypedArray()    
+}
+
+fun main(args: Array<String>) {
+    //Input: intervals = [[1,3],[2,6],[8,10],[15,18]]
+    //Output: [[1,6],[8,10],[15,18]]
+    //Explanation: Since intervals [1,3] and [2,6] overlaps, merge them into [1,6].
+    val intervals = arrayOf(intArrayOf(1,3),
+                            intArrayOf(2,6),
+                            intArrayOf(8,10),
+                            intArrayOf(15,18))
+    println(merge(intervals)))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-435:Non-overlapping Intervals](https://leetcode.com/problems/non-overlapping-intervals/)
+##### Solution Explanation:
+```
+=================================================================================================================================================================
+Solution Approach:
+Greedy Algorithm
+=================================================================================================================================================================
+A classic greedy case: interval scheduling problem.
+
+The heuristic is: always pick the interval with the earliest end time. Then you can get the maximal number of non-overlapping intervals. (or minimal number to remove).
+This is because, the interval with the earliest end time produces the maximal capacity to hold rest intervals.
+E.g. Suppose current earliest end time of the rest intervals is x. Then available time slot left for other intervals is [x:]. If we choose another interval with end time y, then available time slot would be [y:]. Since x ≤ y, there is no way [y:] can hold more intervals then [x:]. Thus, the heuristic holds.
+
+Therefore, we can sort interval by ending time and key track of current earliest end time. Once next interval's start time is earlier than current end time, then we have to remove one interval. Otherwise, we update earliest end time.
+```
+##### Complexity Analysis:
+```
+TC: O(N*log(N))
+
+Time complexity is O(NlogN) as sort overwhelms greedy search.
+
+SC: O(1)
+```
+```python
+from typing import List
+
+def eraseOverlapIntervals(intervals: List[List[int]]) -> int:
+    end, cnt = float('-inf'), 0
+    for s, e in sorted(intervals, key=lambda x: x[1]):
+        if s >= end: 
+            end = e
+        else: 
+            cnt += 1
+    return cnt
+
+if __name__ == "__main__":
+    #Input: intervals = [[1,2],[2,3],[3,4],[1,3]]
+    #Output: 1
+    #Explanation: [1,3] can be removed and the rest of the intervals are non-overlapping.
+    intervals = [[1,2],[2,3],[3,4],[1,3]]
+    print(eraseOverlapIntervals(intervals))
+```
+```kotlin
+fun eraseOverlapIntervals(intervals: Array<IntArray>): Int {
+    if (intervals.isEmpty()) return 0
+    
+    // sorting with end pos
+    intervals.sortWith(Comparator { a, b -> a[1].compareTo(b[1]) })
+
+    var prevEnd = intervals[0][1]
+    var removals = 0
+
+    // greedy
+    for (i in 1..intervals.size - 1) {
+        if (intervals[i][0] < prevEnd)
+            removals++
+        else
+            prevEnd = intervals[i][1]
+    }
+
+    return removals        
+}
+
+fun main(args: Array<String>) {
+    //Input: intervals = [[1,2],[2,3],[3,4],[1,3]]
+    //Output: 1
+    //Explanation: [1,3] can be removed and the rest of the intervals are non-overlapping.
+    val intervals = arrayOf(intArrayOf(1,2),
+                            intArrayOf(2,3),
+                            intArrayOf(3,4),
+                            intArrayOf(1,3))
+    println(eraseOverlapIntervals(intervals)))
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-252:Meeting Rooms](https://leetcode.com/problems/meeting-rooms/)
+##### Solution Explanation:
+```
+=================================================================================================================================================================
+Solution Approach:
+=================================================================================================================================================================
+- If a person can attend all meetings, there must not be any overlaps between any meetings.
+- After sorting the intervals, we can compare the current end and next start.
+```
+##### Complexity Analysis:
+```
+TC: O(N*log(N))
+
+Time complexity is O(NlogN) because of sort.
+
+SC: O(N)
+```
+```python
+from typing import List
+
+def canAttendMeetings(intervals: List[List[int]]) -> bool:
+    intervals.sort(key=lambda x: x[0])
+
+    for i in range(1, len(intervals)):
+        if intervals[i][0] < intervals[i-1][1]:
+            return False
+    return True
+```
+```kotlin
+fun canAttendMeetings(intervals: Array<IntArray>): Boolean {
+    intervals.sortWith(compareBy({it[0]}, {-it[1]}))
+
+    for (i in 1..intervals.size - 1) {
+        if (intervals[i][0] < intervals[i-1][1]) return false
+    }
+        
+    return true
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-253:Meeting Rooms II](https://leetcode.com/problems/meeting-rooms-ii/)
+##### Solution Explanation:
+```
+=================================================================================================================================================================
+Solution Approach:
+=================================================================================================================================================================
+When a room is taken, the room can not be used for anther meeting until the current meeting is over.
+As soon as the current meeting is finished, the room can be used for another meeting.
+
+- We still need to sort the intervals by start time in order to make things easier
+- A very straightforward way is to have a List of Interval and stored as the occupied interval of a room.
+- And the size of the List will be the number of rooms required.
+
+- Because the start time is in increasing order, so that when you found a meeting that needs to be put into one room, 
+  it doesn't matter which available room to put in.
+- E.g. if there are three rooms can support a meeting at 1pm and the end time of three rooms are 9 am , 10 am and 11 am.
+- We can arrange this meeting at 1pm to any of the three. Because we know the next (if has next) meeting will start later than 1pm.
+- No matter where we put 1pm meeting, we will have only two rooms available for the later ones.
+```
+##### Complexity Analysis:
+```
+TC: O(N*log(N))
+
+Time complexity is O(NlogN) because of sort.
+
+SC: O(N)
+```
+```python
+from typing import List
+
+# Definition for an interval.
+class Interval(object):
+    def __init__(self, s=0, e=0):
+        self.start = s
+        self.end = e
+
+def minMeetingRooms(intervals: List[Interval]) -> int:
+    starts, ends = [], []
+    for start, end in intervals:
+        starts.append(start)
+        ends.append(end)
+
+    starts.sort()
+    ends.sort()
+
+    s, e = 0, 0
+    min_rooms, cnt_rooms = 0, 0
+    while s < len(starts):
+        if starts[s] < ends[e]:
+            cnt_rooms += 1  # Acquire a room.
+            # Update the min number of rooms.
+            min_rooms = max(min_rooms, cnt_rooms)
+            s += 1
+        else:
+            cnt_rooms -= 1  # Release a room.
+            e += 1
+
+    return min_rooms
+```
+```kotlin
+class Interval(var `val`: Int) {
+    var s: Int = 0
+    var e: Int = 0
+}
+
+fun minMeetingRooms(intervals: Array<Interval>): Int {
+    val starts = IntArray(intervals.size)
+    val ends = IntArray(intervals.size)
+    for (i in intervals.indices) {
+        starts[i] = intervals[i].start
+        ends[i] = intervals[i].end
+    }
+    Arrays.sort(starts)
+    Arrays.sort(ends)
+    var rooms = 0
+    var activeMeetings = 0
+    var i = 0
+    var j = 0
+    while (i < intervals.size && j < intervals.size) {
+        if (starts[i] < ends[j]) {
+            activeMeetings++
+            i++
+        } else {
+            activeMeetings--
+            j++
+        }
+        rooms = maxOf(rooms, activeMeetings)
+    }
+    return rooms
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
 ## String
 | #     | Title	                                         | url                                                                           | Time   | Space   | Difficulty | Tag	        | Note                   |
 | ----- | ---------------------------------------------- | ----------------------------------------------------------------------------- | ------ | ------- | ---------- | ------------ | ---------------------- |
