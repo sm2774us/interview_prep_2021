@@ -6807,10 +6807,10 @@ fun minMeetingRooms(intervals: Array<Interval>): Int {
 | ----- | ---------------------------------------------- | ----------------------------------------------------------------------------- | ------ | ------- | ---------- | ------------ | ---------------------- |
 | 0206  | [Reverse Linked List](#lc-206reverse-linked-list) | https://leetcode.com/problems/reverse-linked-list/                            | O(n)   | O(1)    | Easy       |              |                        |
 | 0141  | [Linked List Cycle](#lc-141linked-list-cycle) | https://leetcode.com/problems/linked-list-cycle/                              | O(n)   | O(1)    | Easy       |              |                        |
-| 0021  | [Merge Two Sorted Lists](#lc21merge-two-sorted-lists) | https://leetcode.com/problems/merge-two-sorted-lists/                         | O(n)   | O(1)    | Easy       |              |                        |
-| 0023  | [Merge k Sorted Lists](#lc23merge-k-sorted-lists) | https://leetcode.com/problems/merge-k-sorted-lists/                           | O(nlogk) | O(1)  | Hard       |              | Heap, Divide and Conquer |
-| 0019  | [Remove Nth Node From End of List](#lc19remove-nth-node-from-end-of-list) | https://leetcode.com/problems/remove-nth-node-from-end-of-list/               | O(n)   | O(1)    | Medium     |              |                        |
-| 0143  | [Reorder List](#lc143reorder-list) | https://leetcode.com/problems/reorder-list/                                   | O(n)   | O(1)    | Medium     |              |                        |
+| 0021  | [Merge Two Sorted Lists](#lc-21merge-two-sorted-lists) | https://leetcode.com/problems/merge-two-sorted-lists/                         | O(n)   | O(1)    | Easy       |              |                        |
+| 0023  | [Merge k Sorted Lists](#lc2-3merge-k-sorted-lists) | https://leetcode.com/problems/merge-k-sorted-lists/                           | O(nlogk) | O(1)  | Hard       |              | Heap, Divide and Conquer |
+| 0019  | [Remove Nth Node From End of List](#lc-19remove-nth-node-from-end-of-list) | https://leetcode.com/problems/remove-nth-node-from-end-of-list/               | O(n)   | O(1)    | Medium     |              |                        |
+| 0143  | [Reorder List](#lc-143reorder-list) | https://leetcode.com/problems/reorder-list/                                   | O(n)   | O(1)    | Medium     |              |                        |
 
 #### [LC-206:Reverse Linked List](https://leetcode.com/problems/reverse-linked-list/)
 ##### Solution Explanation:
@@ -7595,7 +7595,7 @@ Complexity Analysis
 	+ We can merge two sorted linked list in O(n) time where nn is the total number of nodes in two lists.
 	+ Sum up the merge process and we can get: 
 ```
->      [equation](https://latex.codecogs.com/png.image?\dpi{150}%20O(\sum_{i=1}^{log_{2}k}N)=O(Nlogk))
+>      ![equation](https://latex.codecogs.com/png.image?\dpi{150}%20O(\sum_{i=1}^{log_{2}k}N)=O(Nlogk))
 ```
 - Space complexity : O(1)
 
