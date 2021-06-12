@@ -6802,6 +6802,1339 @@ fun minMeetingRooms(intervals: Array<Interval>): Int {
 </div>
 <br/>
 
+## Linked List
+| #     | Title	                                         | url                                                                           | Time   | Space   | Difficulty | Tag	        | Note                   |
+| ----- | ---------------------------------------------- | ----------------------------------------------------------------------------- | ------ | ------- | ---------- | ------------ | ---------------------- |
+| 0206  | [Reverse Linked List](#lc-206reverse-linked-list) | https://leetcode.com/problems/reverse-linked-list/                            | O(n)   | O(1)    | Easy       |              |                        |
+| 0141  | [Linked List Cycle](#lc-141linked-list-cycle) | https://leetcode.com/problems/linked-list-cycle/                              | O(n)   | O(1)    | Easy       |              |                        |
+| 0021  | [Merge Two Sorted Lists](#lc21merge-two-sorted-lists) | https://leetcode.com/problems/merge-two-sorted-lists/                         | O(n)   | O(1)    | Easy       |              |                        |
+| 0023  | [Merge k Sorted Lists](#lc23merge-k-sorted-lists) | https://leetcode.com/problems/merge-k-sorted-lists/                           | O(nlogk) | O(1)  | Hard       |              | Heap, Divide and Conquer |
+| 0019  | [Remove Nth Node From End of List](#lc19remove-nth-node-from-end-of-list) | https://leetcode.com/problems/remove-nth-node-from-end-of-list/               | O(n)   | O(1)    | Medium     |              |                        |
+| 0143  | [Reorder List](#lc143reorder-list) | https://leetcode.com/problems/reorder-list/                                   | O(n)   | O(1)    | Medium     |              |                        |
+
+#### [LC-206:Reverse Linked List](https://leetcode.com/problems/reverse-linked-list/)
+##### Solution Explanation:
+```
+=================================================================================================================================================================
+Intuition
+=================================================================================================================================================================
+To reverse a linked list, we actually reverse the direction of every next pointer.
+For example, we reverse a linked list 1->2->3->4->5 by changing every -> to <- and get the result as 1<-2<-3<-4<-5. And we need to return the pointer to 5 instead of to 1.
+To solve it efficiently, we can do it in one loop iteration or recursion.
+
+=================================================================================================================================================================
+Iterative Solution Approach:
+=================================================================================================================================================================
+
+- For iteration, we create a ListNode rev to keep track of what we have reversed otherwise we would lose it.
+- Then we iterate linked list and make head point to the current node.
+- We change a -> to <- by calling head.next = rev, update rev by calling rev = head, move to next node by calling head = head.next.
+- To save a temporary variable, we could assign these variables in one line, but head.next and rev should be updated 
+  before head is updated otherwise direction would not be reversed and rev would keep pointing to itself.
+- For example, 1->2->3, 1 is current node head, what we have reversed rev is None, 2 is head.next.
+- Calling head.next = rev leads to None<-1. Calling head = head.next concurrently to make head pointing to 2->3.
+- Updating rev as 1->None. And in next iteration, we will change 2->3 to 1<-2 and keep changing -> to <- so on so forth.
+
+=================================================================================================================================================================
+Recursive Solution Approach:
+=================================================================================================================================================================
+
+- For recursion, the bottom layer is the end of the origin linked list so we just return it.
+- For the outer layer, for example, 4->5, we change -> to <- by calling head.next.next = head where head points at 4 
+  and head.next points at 5. node, which is self.reverseList(head.next) also points at 5 or 5->4, is what we need to return in this layer.
+- So when we keep returning to the outer layer, reversed linked list keep growing (a -> b becomes a <- b as head.next.next = head)
+- Another example, in some recursion, you have linked list 1->2->3->null, reversed linked list 5->4->3->null.
+  head points at 2, head.next points at 3, 5->4->3->null is what you have reversed and stored in node=reversedList(head.next).
+- Now you need to place 2 to the end of 5->4->3. So you call head.next.next = head or 3.next = 2, and head.next = null or 2.next = null.
+- Then you have original linked list 1->2->null, and reversed linked list (head node 5 stored in node) 5->4->3->2->null.
+- Then you return these to outer recursion.
+```
+##### Complexity Analysis:
+```
+One thing should be notice that we should always be fully aware of what a variable points at. The rev and reverseList_Recu(node) point at the head of the reversed linked list while the current node head that we are visiting in origin linked list point at the tail of the reversed linked list.
+Both methods take a liner scan without extra space. So time complexity is O(n) and space is O(1).
+
+TC: O(N)
+SC: O(1)
+```
+```python
+import unittest
+
+# Definition for singly-linked list.
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+    @classmethod
+    def initList(self, nums):
+        if not nums:
+            return None
+        head = None
+        current = None
+
+        for n in nums:
+            if not head:
+                head = ListNode(n)
+                current = head
+            else:
+                node = ListNode(n)
+                current.next = node
+                current = node
+        return head
+
+    @classmethod
+    def linkedListToList(self, head):
+        if not head:
+            return []
+
+        pointer = head
+        sll_list = []
+        while pointer:
+            sll_list.append(pointer.val)
+            pointer = pointer.next
+        return sll_list
+
+class Solution:
+    def reverseListIterative(self, head: ListNode) -> ListNode:
+        if not head or not head.next:
+            return head
+	    rev = None
+	    while head: 
+		    head.next, rev, head = rev, head, head.next
+	    return rev		
+
+    def reverseListRecursive(self, head: ListNode) -> ListNode:
+        if not head or not head.next:
+            return head
+        node, head.next.next, head.next = reverseListRecu(head.next), head, None
+        return node
+
+class Test(unittest.TestCase):
+    def setUp(self) -> None:
+        pass
+
+    def tearDown(self) -> None:
+        pass
+
+    def test_reverseList(self) -> None:
+        sol = Solution()
+        for head, solution in (
+            [
+                [1, 2, 3, 4, 5, None],
+                [None, 5, 4, 3, 2, 1],
+            ],
+            [
+                [1, 2, 3, 4, 5, 6],
+                [6, 5, 4, 3, 2, 1]
+            ],
+            [
+                [2, 7, 8, 9, 10],
+                [10, 9, 8, 7, 2]
+            ]
+        ):
+            self.assertEqual(
+                ListNode.linkedListToList(sol.reverseListIterative(ListNode.initList(head))),
+                solution
+            )
+            self.assertEqual(
+                ListNode.linkedListToList(sol.reverseListRecursive(ListNode.initList(head))),
+                solution
+            )
+
+if __name__ == "__main__":
+    unittest.main()
+```
+```kotlin
+//Definition for singly-linked list.
+class ListNode(var `val`: Int) {
+    var next: ListNode? = null
+}
+
+fun reverseList(head: ListNode?): ListNode? {
+    if (head == null) return null
+    var currNode: ListNode? = head
+    var prevNode: ListNode? = null
+    var nextNode: ListNode? = null
+    while(currNode != null) {
+        nextNode = currNode!!.next
+        currNode!!.next = prevNode
+        prevNode = currNode
+        currNode = nextNode
+    }
+    return prevNode       
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-141:Linked List Cycle](https://leetcode.com/problems/linked-list-cycle/)
+##### Floyd's Cycle Detection Algorithm (Visual Explanation):
+```
+**************************************************************************
+Floyd's Cycle Detection Algorithm
+**************************************************************************
+This is the fastest method to solve this problem and has been described below:
+  * Traverse linked list using two pointers.
+  * Move one pointer(slow) by one and another pointer(fast) by two.
+  * If these pointers meet at the same node then there is a loop. If pointers do not meet then linked list
+    doesn’t have a loop.
+  * Below image shows how the detectloop function works in the code :
+
+                                slow   fast
+                                \|/    \|/
+  Initially :   +------+       +-+------+---+     +--------+---+
+                | Head | ----->| 10     |  -|---->| 15     |   |
+                +------+       +--------+-+-+     +--------+-|-+
+                                         /|\                \|/
+                               +--------+-|-+     +--------+-+-+
+                               | 20     |   |     | 4      |   |
+                               +--------+-+-+     +--------+-|-+
+                                         /|\                \|/
+                                          +------------------+
+
+                                                   slow
+                                                   \|/
+  Step 1    :   +------+       +--------+---+     +-+------+---+
+                | Head | ----->| 10     |  -|---->| 15     |   |
+                +------+       +--------+-+-+     +--------+-|-+
+                                         /|\                \|/
+                               +--------+-|-+     +--------+-+-+
+                               | 20     |   |     | 4      |   |<--- fast
+                               +--------+-+-+     +--------+-|-+
+                                         /|\                \|/
+                                          +------------------+
+
+                                fast
+                                \|/
+  Step 2    :   +------+       +-+------+---+     +--------+---+
+                | Head | ----->| 10     |  -|---->| 15     |   |
+                +------+       +--------+-+-+     +--------+-|-+
+                                         /|\                \|/
+                               +--------+-|-+     +--------+-+-+
+                               | 20     |   |     | 4      |   |<--- slow
+                               +--------+-+-+     +--------+-|-+
+                                         /|\                \|/
+                                          +------------------+
+
+  Step 3    :   +------+       +--------+---+     +--------+---+
+                | Head | ----->| 10     |  -|---->| 15     |   |
+                +------+       +--------+-+-+     +--------+-|-+
+                                         /|\                \|/
+                               +--------+-|-+     +--------+-+-+
+                               | 20     |   |     | 4      |   |<--- fast
+                               +-+------+-+-+     +--------+-|-+
+                                /|\      /|\                \|/
+                                slow      +------------------+
+
+                                slow   fast
+                                \|/    \|/
+  Step 4    :   +------+       +-+------+---+     +--------+---+
+                | Head | ----->| 10     |  -|---->| 15     |   |
+                +------+       +--------+-+-+     +--------+-|-+
+                                         /|\                \|/
+                               +--------+-|-+     +--------+-+-+
+                               | 20     |   |     | 4      |   |
+                               +--------+-+-+     +--------+-|-+
+                                         /|\                \|/
+                                          +------------------+
+
+                LOOP DETECTED
+
+**************************************************************************
+
+Source: https://cs.stackexchange.com/questions/10360/floyds-cycle-detection-algorithm-determining-the-starting-point-of-cycle
+        [ Floyd's Cycle detection algorithm | Determining the starting point of cycle ]
+        https://en.wikipedia.org/wiki/Cycle_detection#Tortoise_and_hare
+        https://en.wikipedia.org/wiki/Cycle_detection
+        http://blog.ostermiller.org/find-loop-singly-linked-list
+
+Youtube:  https://www.youtube.com/watch?v=zbozWoMgKW0 [ Detect loop in linked list(floyd algo / Tortoise and hare algo) ]
+          https://www.youtube.com/watch?v=LUm2ABqAs1w [ Why Floyd's cycle detection algorithm works? Detecting loop in a linked list. ]
+```
+##### Solution Explanation:
+```
+=================================================================================================================================================================
+Solution Approach:
+
+Floyd's Cycle-Finding Algorithm
+=================================================================================================================================================================
+References: https://codingfreak.blogspot.com/2012/09/detecting-loop-in-singly-linked-list_22.html
+
+Floyd's Cycle-Finding Algorithm
+--------------------------------
+In simple terms it is also known as "Tortoise and Hare Algorithm" or "Floyd's Cycle Detection Algorithm" 
+named after its inventor Robert Floyd. It is one of the simple cycle detection algorithm. It's a simple pointers based approach.
+
+
+Let us take 2 pointers namely slow Pointer and fast Pointer to traverse a Singly Linked List at different speeds. 
+A slow Pointer (Also called Tortoise) moves one step forward while fast Pointer (Also called Hare) moves 2 steps forward
+ 1. Start Tortoise and Hare at the first node of the List.
+ 2. If Hare reaches end of the List, return as there is no loop in the list.
+ 3. Else move Hare one step forward.
+ 4. If Hare reaches end of the List, return as there is no loop in the list.
+ 5. Else move Hare and Tortoise one step forward.
+ 6. If Hare and Tortoise pointing to same Node return, we found loop in the List.
+ 7. Else start with STEP-2.
+
+Pseudocode:
+-------------
+tortoise := firstNode
+hare := firstNode
+
+forever:
+
+  if hare == end 
+    return 'No Loop Found'
+
+  hare := hare.next
+
+  if hare == end
+    return 'No Loop Found'
+
+  hare = hare.next
+  tortoise = tortoise.next
+
+  if hare == tortoise
+    return 'Loop Found'
+-------------
+
+Q> Why can't we let the Hare go by itself like Tortoise ?
+A> If there is a loop, Hare would just go forever. Tortoise ensures that you will only take 'n' steps atmost.
+
+Q> How to find the length of the Loop ?
+A> Once Hare and Tortoise finds the loop in a Singly linked List move Tortoise one step forward everytime maintaining the count of the nodes until it reaches the Hare again.
+```
+##### Complexity Analysis:
+```
+Time Complexity: O(N)
+Space Complexity: O(1)
+
+To calculate the Time Complexity the shape of the cycle doesn't matter.
+It can have a long tail, 
+and a loop towards the end or just a loop from the beginning to the end without a tail. 
+Irrespective of the shape of the cycle, one thing is clear - that the Tortoise can never catch up with the Hare.
+If the two has to meet, the Hare has to catch up with the Tortoise from behind.
+
+With that established, consider the two possibilities
+ Case-1) Hare is one step behind Tortoise
+ Case-2) Hare is two step behind Tortoise
+
+All greater distances will reduce to One or Two. Let us assume always Tortoise moves first  (it could be even other way).
+
+Case-1:
+-------
+In the first case were the distance between Hare and Tortoise is one step.
+ - Tortoise moves one step forward and the distance  between Hare and Tortoise becomes 2.
+ - Now Hare moves 2 steps forward meeting up with Tortoise.
+
+Case-2:
+-------
+In the second case were the distance between Hare and Tortoise is two steps.
+ - Tortoise moves one step forward and the distance between Hare and Tortoise becomes 3.
+ - Now Hare moved 2 steps forward which makes the distance between Hare and Tortoise as 1. 
+
+It is similar to first case which we already proved that both Hare and Tortoise will meet up in next step.
+
+Let the length of the loop be 'n' and there are 'p' variables before the loop.
+Hare traverses the loop twice in 'n' moves, they are guaranteed to meet in O(n).
+```
+```python
+import unittest
+
+# Definition for singly-linked list.
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+    @classmethod
+    def initList(self, nums):
+        if not nums:
+            return None
+        head = None
+        current = None
+
+        for n in nums:
+            if not head:
+                head = ListNode(n)
+                current = head
+            else:
+                node = ListNode(n)
+                current.next = node
+                current = node
+        return head
+
+    @classmethod
+    def linkedListToList(self, head):
+        if not head:
+            return []
+
+        pointer = head
+        sll_list = []
+        while pointer:
+            sll_list.append(pointer.val)
+            pointer = pointer.next
+        return sll_list
+
+class Solution:
+    def hasCycle(head: ListNode) -> bool:
+        if not head or not head.next:
+            return False
+        fast, slow = head, head
+        while fast and fast.next:
+            fast, slow = fast.next.next, slow.next
+            if fast is slow:
+                return True
+        return False
+
+class Test(unittest.TestCase):
+    def setUp(self) -> None:
+        pass
+
+    def tearDown(self) -> None:
+        pass
+
+    def test_hasCycle(self) -> None:
+        listNode = ListNode()
+        s = Solution()
+        for head, solution in (
+            [[3, 2, 0, -4], True],
+            [[1, 2], True],
+            [[1], False],
+        ):
+            self.assertEqual(
+                solution,
+                s.hasCycle(ListNode.initList(head)),
+                "Should determine if the linked list has a cycle in it",
+            )
+
+if __name__ == "__main__":
+    unittest.main()
+```
+```kotlin
+// Floyd's Cycle-Finding Algorithm
+
+// Time:  O(n)
+// Space: O(1)
+
+// Definition for singly-linked list.
+class ListNode(var `val`: Int) {
+    var next: ListNode? = null
+}
+
+fun hasCycle(head: ListNode?): Boolean {
+    if (head == null) return false
+    var fast = head; var slow = head
+        
+    while (fast?.next != null && fast.next.next != null) {
+        fast = fast.next.next
+        slow = slow?.next
+        if(slow == fast) return true
+    }
+    return false   
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-21:Merge Two Sorted Lists](https://leetcode.com/problems/merge-two-sorted-lists/)
+##### Python Learning Points:
+```
+-------------------------------------------------------------------------------------------------------------------
+Reference: https://stackoverflow.com/questions/58715870/explanation-about-dummy-nodes-and-pointers-in-linked-lists
+-------------------------------------------------------------------------------------------------------------------
+The crucial thing here is that when you set a Python variable to an object, it's a pointer, not a value. So in this code here:
+
+dummy = cur = ListNode(0)
+# cur = 0
+# dummy = 0
+dummy and cur both point to the same object (i.e. the same single-element list). When you append your other list to cur, you're simultaneously appending it to dummy because it's the same list.
+
+When you do this:
+
+cur = cur.next
+# cur = 1->4->5
+# dummy = 0->1->4->5
+you're not creating a new list, you're just iterating your cur pointer down the existing list. Both pointers are part of the same list, but dummy points to the first element and cur points to the second element.
+
+Each time you call ListNode() you're creating a new node, so if you want to create two nodes with the same value, you need to call the initializer twice:
+
+dummy = ListNode(0)
+cur = ListNode(0)
+# cur and dummy both have values of 0, but they're different list objects!
+```
+##### Learning From Youtube Video Solutions:
+```
+Linkedlists can be confusing especially if you've recently started to code but (I think) once you understand it fully, it should not be that difficult.
+
+For this problem, I'm going to explain several ways of solving it BUT I want to make something clear. 
+Something that you've seen a lot of times in the posts on this website but probably haven't fully understood. dummy variable!
+It has been used significantly in the solutions of this problem and not well explained for a newbie level coder!
+The idea is we're dealing with pointers that point to a memory location! Think of it this way!
+You want to find gold that is hidden somewhere. Someone has put a set of clues in a sequence!
+Meaning, if you find the first clue and solve the problem hidden in the clue, you will get to the second clue!
+Solving the hidden problem of second clue will get you to the thrid clue, and so on!
+If you keep solving, you'll get to the gold! dummy helps you to find the first clue!!!!
+
+Throughout the solution below, you'll be asking yourself why dummy is not changing and we eventually return dummy.next????
+It doesn't make sense, right?
+However, if you think that dummy is pointing to the start and there is another variable (temp) that makes the linkes from node to node,
+you'll have a better feeling!
+Similar to the gold example if I tell you the first clue is at location X, then, you can solve clues sequentially 
+(because of course you're smart) and bingo! you find the gold! Watch this.
+
+https://www.youtube.com/watch?v=3O_f_sk3mFc
+
+This video shows why we need the dummy!
+Since we're traversing using temp but once temp gets to the tail of the sorted merged linkedlist,
+there's no way back to the start of the list to return as a result! So dummy to the rescue!
+it does not get changed throughout the list traversals temp is doing!
+So, dummy makes sure we don't loose the head of the thread (result list).
+Does this make sense? Alright! Enough with dummy!
+
+I think if you get this, the first solution feels natural! Now, watch this. You got the idea?? Nice!
+
+https://www.youtube.com/watch?v=GfRQvf7MB3k
+```
+##### Solution Explanation:
+```
+1) Iterative Solution
+----------------------
+First you initialize dummy and temp.
+One is sitting at the start of the linkedlist and the other (temp) is going to move forward find which value 
+should be added to the list. Note that it's initialized with a value 0 but it can be anything! 
+You initialize it with your value of choice! Doesn't matter since we're going to finally return dummy.next which disregards 0 
+that we used to start the linkedlist. 
+
+- Line #1 makes sure none of the l1 and l2 are empty!
+- If one of them is empty, we should return the other! If both are nonempty, we check val of each of them to add the smaller 
+  one to the result linkedlist!
+- In line #2, l1.val is smaller and we want to add it to the list.
+- How? We use temp POINTER (it's pointer, remember that!).
+- Since we initialized temp to have value 0 at first node, we use temp.next to point 0 to the next value we're going 
+  to add to the list l1.val (line #3). Once we do that, we update l1 to go to the next node of l1.
+- If the if statement of line #2 doesn't work, we do similar stuff with l2. And finally, if the length of l1 and l2 are not the same,
+  we're going to the end of one of them at some point!
+- Line #5 adds whatever left from whatever linkedlist to the temp.next (check the above video for a great explanation of this part).
+- Note that both linkedlists were sorted initially. Also, this line takes care of when one of the linkedlists are empty.
+- Finally, we return dummy.next since dummy is pointing to 0 and next to zero is what we've added throughout the process.
+----------------------
+2) Recursive Solution
+----------------------
+Another way of solving is problem is by doing recursion. This is from here (https://leetcode.com/problems/merge-two-sorted-lists/discuss/9735/Python-solutions-(iteratively-recursively-iteratively-in-place)).
+- The first check is obvious! If one of them is empty, return the other one!
+- Similar to line #5 of previous solution.
+- Here, we have two cases, whatever list has the smaller first element (equal elements also satisfies line #1),
+  will be returned at the end. In the example l1 = [1,2,4], l2 = [1,3,4], we go in the if statement of line #1 first,
+  this means that the first element of l1 doesn't get changed!
+- Then, we move the pointer to the second element of l1 by calling the function again but with l1.next and l2 as input!
+- This round of call, goes to line #2 because now we have element 1 from l2 versus 2 from l1.
+- Now, basically, l2 gets connected to the tail of l1. We keep moving forward by switching between l1 and l2 until the last element.
+- Sorry if it's not clear enough! I'm not a fan of recursion for such a problems!
+- But, let me know which part it's hard to understand, I'll try to explain better!
+----------------------
+```
+##### Complexity Analysis:
+```
+Time Complexity: O(N)
+Space Complexity: O(1)
+```
+```python
+from typing import List
+import unittest
+
+# Definition for singly-linked list.
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+    @classmethod
+    def initList(self, nums):
+        if not nums:
+            return None
+        head = None
+        current = None
+
+        for n in nums:
+            if not head:
+                head = ListNode(n)
+                current = head
+            else:
+                node = ListNode(n)
+                current.next = node
+                current = node
+        return head
+
+    @classmethod
+    def linkedListToList(self, head):
+        if not head:
+            return []
+
+        pointer = head
+        sll_list = []
+        while pointer:
+            sll_list.append(pointer.val)
+            pointer = pointer.next
+        return sll_list
+
+class Solution:
+    def mergeTwoListsIterative(self, l1: ListNode, l2: ListNode) -> ListNode:   
+        dummy = temp = ListNode(0)
+        while l1 != None and l2 != None: #1
+
+            if l1.val < l2.val: #2
+                temp.next = l1 #3
+                l1 = l1.next #4
+            else: 
+                temp.next = l2
+                l2 = l2.next
+            temp = temp.next
+        temp.next = l1 or l2  #5
+        return dummy.next #6
+		
+    def mergeTwoListsRecursive(self, l1: ListNode, l2: ListNode) -> ListNode:   
+        if not l1 or not l2:
+            return l1 or l2
+        
+        if l1.val <= l2.val: #1
+            l1.next = self.mergeTwoLists(l1.next, l2)
+            return l1
+        else: #2
+            l2.next = self.mergeTwoLists(l1, l2.next)
+            return l2
+
+class Test(unittest.TestCase):
+    def setUp(self) -> None:
+        pass
+
+    def tearDown(self) -> None:
+        pass
+
+    def test_mergeTwoLists(self) -> None:
+        listNode = ListNode()
+        s = Solution()
+        for l1, l2, solution in (
+            [
+                [1, 2, 4],
+                [1, 3, 4],
+                [1, 1, 2, 3, 4, 4],
+            ],
+            [
+                [5, 10, 15, 40]),
+                [2, 3, 20],
+                [2, 3, 5, 10, 15, 20, 40],
+            ],
+            [
+                [1, 1],
+                [2, 4],
+                [1, 1, 2, 4],
+            ],
+        ):
+            self.assertEqual(
+                solution,
+                ListNode.linkedListToList(s.mergeTwoListsIterative(ListNode.initList(l1), ListNode.initList(l2))),
+                "Should merge two sorted linked lists and return it as a new sorted list",
+            )
+            self.assertEqual(
+                solution,
+                ListNode.linkedListToList(s.mergeTwoListsRecursive(ListNode.initList(l1), ListNode.initList(l2))),
+                "Should merge two sorted linked lists and return it as a new sorted list",
+            )
+
+if __name__ == "__main__":
+    unittest.main()
+```
+```kotlin
+// Definition for singly-linked list.
+class ListNode(var `val`: Int) {
+    var next: ListNode? = null
+}
+
+// iteratively
+fun mergeTwoLists(l1: ListNode?, l2: ListNode?): ListNode? {
+    val dummy = ListNode(0)
+    var n1 = l1
+    var n2 = l2
+    var d = dummy
+
+    while (n1 != null && n2 != null) {
+        if (n1.`val` < n2.`val`) {
+            d?.next = n1
+            n1 = n1.next
+        } else {
+            d?.next = n2
+            n2 = n2.next
+        }
+        d = d?.next
+    }
+    if (n1 != null) d.next = n1
+    if (n2 != null) d.next = n2
+    return dummy.next        
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-23:Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/)
+##### Data Structure Learning Points - What is a Priority Queue ?
+```
+In computer science, a priority queue is an abstract data type similar to a regular queue or stack data structure in which each element additionally 
+has a "priority" associated with it. In a priority queue, an element with high priority is served before an element with low priority.
+In some implementations, if two elements have the same priority, they are served according to the order in which they were enqueued,
+while in other implementations, ordering of elements with the same priority is undefined.
+
+While priority queues are often implemented with heaps, they are conceptually distinct from heaps.
+A priority queue is a concept like "a list" or "a map"; just as a list can be implemented with a linked list or an array,
+a priority queue can be implemented with a heap or a variety of other methods such as an unordered array.
+```
+##### Interview Note
+```
+In an interview situation, use "Approach 2: Merge with Divide And Conquer".
+This is what an interviewer expects.
+```
+##### Solution Explanation:
+```
+----------------------------------------------------
+Approach 1: Compare one-by-one using Priority Queue
+----------------------------------------------------
+
+Algorithm
+
+- Compare every k nodes (head of every linked list) and get the node with the smallest value.
+- Extend the final sorted linked list with the selected nodes.
+- Optimize the comparison process by using a priority queue data structure.
+
+----------------------------------------------------
+Approach 2: Merge with Divide And Conquer
+----------------------------------------------------
+
+Intuition & Algorithm
+----------------------
+We don't need to traverse most nodes many times repeatedly
+
+ - Pair up k lists and merge each pair.
+ - After the first pairing, k lists are merged into k/2 lists with average 2N/k length,
+   then k/4, k/8 and so on.
+ - Repeat this procedure until we get the final sorted linked list.
+
+Thus, we'll traverse almost NN nodes per pairing and merging, and repeat this procedure about log2(k) times.
+            +------------------------------------------------------------------+
+            |  Lists                                                           |
+			| +-------+  +-------+  +-------+  +-------+  +-------+  +-------+ |
+			| | list0 |  | list1 |  | list2 |  | list3 |  | list4 |  | list5 | |
+			| +-------+  +-------+  +-------+  +-------+  +-------+  +-------+ |
+			+---|----------/-----------|---------/-----------|---------/-------+
+                |         /            |        /            |        /
+Merging         |        /             |       /             |       /
+   +------------|-------/--------------|------/--------------|------/-----+
+   | Lists      |      /               |     /               |     /      |
+   |           \|/   \/_              \|/  \/_              \|/  \/_      |
+   |         +--*----*---+          +--*---*---+          +--*---*---+    |
+   |         |   list0   |          |  list2   |          |   list4  |    |
+   |         +-----------+          +----------+          +----------+    |
+   +------------|--------------------/----------------------|-------------+
+Merging         |        +----------+                       |
+   +------------|-------/-----------------------------------|------------+
+   | Lists     \|/    \/_                                  \|/           |
+   |         +--*-----*---+                               +-*--------+   |
+   |         |   list0    |                               |   list4  |   |
+   |         +------------+                               +----------+   |
+   +------------|---------------------------------------------/----------+
+Merging         |        +-----------------------------------+
+                |       /
+               \|/    \/_
+			 +--*-----*----+
+			 |    result   |
+			 +-------------+
+```
+##### Complexity Analysis:
+```
+----------------------------------------------------
+Approach 1: Compare one-by-one using Priority Queue
+----------------------------------------------------
+Complexity Analysis
+----------------------------------------------------
+```
+>- Time complexity : ![equation](https://latex.codecogs.com/png.image?\dpi{150}%20O(Nlogk)) where k is the number of linked lists.
+>
+```
+	+ The comparison cost will be reduced to O(logk) for every pop and insertion to priority queue.
+	+ But finding the node with the smallest value just costs O(1) time.
+	+ There are N nodes in the final linked list.
+
+- Space complexity :
+
+	+ O(n) Creating a new linked list costs O(n) space.
+	+ O(k) The code above present applies in-place method which cost O(1) space.
+	  And the priority queue (often implemented with heaps) costs O(k) space 
+	  (it's far less than N in most situations).
+
+----------------------------------------------------
+Approach 2: Merge with Divide And Conquer
+----------------------------------------------------
+Complexity Analysis
+----------------------------------------------------
+```
+>- Time complexity : ![equation](https://latex.codecogs.com/png.image?\dpi{150}%20O(Nlogk)) where k is the number of linked lists.
+>
+```
+	+ We can merge two sorted linked list in O(n) time where nn is the total number of nodes in two lists.
+	+ Sum up the merge process and we can get: 
+```
+>      [equation](https://latex.codecogs.com/png.image?\dpi{150}%20O(\sum_{i=1}^{log_{2}k}N)=O(Nlogk))
+```
+- Space complexity : O(1)
+
+	+ We can merge two sorted linked lists in O(1) space.
+```
+```python
+import heapq
+from queue import PriorityQueue
+from typing import List
+import unittest
+
+# Definition for singly-linked list.
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+    @classmethod
+    def initList(self, nums):
+        if not nums:
+            return None
+        head = None
+        current = None
+
+        for n in nums:
+            if not head:
+                head = ListNode(n)
+                current = head
+            else:
+                node = ListNode(n)
+                current.next = node
+                current = node
+        return head
+
+    @classmethod
+    def linkedListToList(self, head):
+        if not head:
+            return []
+
+        pointer = head
+        sll_list = []
+        while pointer:
+            sll_list.append(pointer.val)
+            pointer = pointer.next
+        return sll_list
+
+
+# https://stackoverflow.com/questions/40205223/priority-queue-with-tuples-and-dicts
+class use_only_first:
+    def __init__(self, first, second):
+        self._first, self._second = first, second
+
+    def __lt__(self, other):
+        return self._first < other._first
+		
+class Solution:
+
+    #----------------------------------------------------
+    #Approach 1: Compare one-by-one using Priority Queue
+    #----------------------------------------------------
+    # Using heapq for Priortiy Queue
+    def mergeKListsUsingHeap(self, lists: List[ListNode]) -> ListNode:
+	    h = [(l.val, idx) for idx, l in enumerate(lists) if l]
+        heapq.heapify(h)
+        head = cur = ListNode(None)
+        while h:
+            val, idx = heapq.heappop(h)
+            cur.next = ListNode(val)
+            cur = cur.next
+            node = lists[idx] = lists[idx].next
+            if node:
+                heapq.heappush(h, (node.val, idx))
+        return head.next
+	
+	# Using PriorityQueue class
+	def mergeKListsUsingPriorityQueue(self, lists: List[ListNode]) -> ListNode:
+	    q = PriorityQueue()
+        for l in lists:
+            if l:
+                q.put(use_only_first(l.val, l))
+        head = point = ListNode(0)
+        while not q.empty():    # PriorityQueue has no len()
+            use_object = q.get()
+            val = use_object._first
+            node = use_object._second
+            point.next = ListNode(val)
+            point = point.next
+            node = node.next
+            if node:
+                q.put(use_only_first(node.val, node))
+        return head.next
+		
+    #----------------------------------------------------
+    #Approach 2: Merge with Divide And Conquer
+    #----------------------------------------------------
+	def mergeKListsUsingDivideAndConquer(self, lists: List[ListNode]) -> ListNode:
+        if not lists:
+            return None
+        if len(lists) == 1:
+            return lists[0]
+        mid = len(lists) // 2
+        l, r = self.mergeKListsUsingDivideAndConquer(lists[:mid]), self.mergeKListsUsingDivideAndConquer(lists[mid:])
+        return self.merge(l, r)
+    
+    def merge(self, l, r):
+        dummy = p = ListNode()
+        while l and r:
+            if l.val < r.val:
+                p.next = l
+                l = l.next
+            else:
+                p.next = r
+                r = r.next
+            p = p.next
+        p.next = l or r
+        return dummy.next
+
+class Test(unittest.TestCase):
+    def setUp(self) -> None:
+        pass
+
+    def tearDown(self) -> None:
+        pass
+
+    def test_mergeTwoLists(self) -> None:
+        listNode = ListNode()
+        s = Solution()
+        for lists, solution in (
+            [
+                [[1,4,5],[1,3,4],[2,6]],
+                [1,1,2,3,4,4,5,6]
+            ],
+            [
+                [],
+                []
+            ],
+            [
+                [[]],
+                []
+            ]
+        ):
+            self.assertEqual(
+                solution,
+                ListNode.linkedListToList(s.mergeKListsUsingHeap([ListNode.initList(lst) for lst in lists])),
+                "Should merge K sorted linked lists and return it as a new sorted list",
+            )
+            self.assertEqual(
+                solution,
+                ListNode.linkedListToList(s.mergeKListsUsingPriorityQueue([ListNode.initList(lst) for lst in lsts])),
+                "Should merge K sorted linked lists and return it as a new sorted list",
+            )
+            self.assertEqual(
+                solution,
+                ListNode.linkedListToList(s.mergeKListsUsingDivideAndConquer([ListNode.initList(lst) for lst in lists])),
+                "Should merge K sorted linked lists and return it as a new sorted list",
+            )
+
+if __name__ == "__main__":
+    unittest.main()
+```
+```kotlin
+// Definition for singly-linked list.
+class ListNode(var `val`: Int) {
+    var next: ListNode? = null
+}
+
+/*
+ run time O(nlgk)
+ space O(1)
+*/
+fun mergeKLists(lists: Array<ListNode?>): ListNode? {
+    if (lists.isEmpty()) return null
+    return lists.build()
+}
+
+private fun Array<ListNode?>.build(start: Int = 0, end: Int = lastIndex): ListNode? {
+    if (start == end) {
+        return get(start)
+    }
+
+    // divide:
+    val middle = start + (end - start) / 2
+    val left = build(start, middle)
+    val right = build(middle + 1, end)
+
+    // conquer:
+    return merge(left, right)
+}
+
+private fun merge(left: ListNode?, right: ListNode?): ListNode? {
+    val head = ListNode(0)
+    var pointer: ListNode? = head
+    var l = left;
+    var r = right
+    while (l != null && r != null) {
+        if (l.`val` < r.`val`) {
+            pointer?.next = l
+            l = l.next
+        } else {
+            pointer?.next = r
+            r = r.next
+        }
+        pointer = pointer?.next
+    }
+    if (l != null) {
+        pointer?.next = l
+    } else {
+        pointer?.next = r
+    }
+    return head.next
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-19:Remove Nth Node From End of List](https://leetcode.com/problems/remove-nth-node-from-end-of-list/)
+##### Solution Explanation:
+```
+Solution - I (One-Pointer, Two-Pass)
+---------------------------------------------------
+This approach is very intuitive and easy to get.
+  - We just iterate in the first-pass to find the length of the linked list - len.
+  - In the next pass, iterate len - n - 1 nodes from start and delete the next node (which would be nth node from end).
+  
+Solution (Two-Pointer, One-Pass)
+---------------------------------------------------
+We are required to remove the nth node from the end of list.
+For this, we need to traverse N - n nodes from the start of the list,
+where N is the length of linked list.
+We can do this in one-pass as follows:
+
+  - Let's assign two pointers - fast and slow to head.
+    We will first iterate for n nodes from start using the fast pointer.
+
+  - Now, between the fast and slow pointers, there is a gap of n nodes.
+    Now, just Iterate and increment both the pointers till fast reaches the last node.
+	The gap between fast and slow is still of n nodes, meaning that slow is nth node from the last node (which currently is fast).
+
+For eg. let the list be 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9, and n = 4.
+
+1. 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> null
+   ^slow               ^fast
+   |<--gap of n nodes-->|
+ 
+ => Now traverse till fast reaches end
+ 
+ 2. 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> null
+                        ^slow               ^fast
+                        |<--gap of n nodes-->|
+						
+'slow' is at (n+1)th node from end.
+So just delete nth node from end by assigning slow -> next as slow -> next -> next (which would remove nth node from end of list).
+
+  - Since we have to delete the nth node from end of list (And not nth from the last of list!),
+    we just delete the next node to slow pointer and return the head.
+
+```
+##### Complexity Analysis:
+```
+Solution - I (One-Pointer, Two-Pass)
+---------------------------------------------------
+Time Complexity : O(N), where, N is the number of nodes in the given list.
+Space Complexity : O(1), since only constant space is used.
+
+Solution (Two-Pointer, One-Pass)
+---------------------------------------------------
+Time Complexity : O(N), where, N is the number of nodes in the given list. Although, the time complexity is same as above solution, we have reduced the constant factor in it to half.
+Space Complexity : O(1), since only constant space is used.
+```
+##
+```
+Note : The Problem only asks us to remove the node from the linked list and not delete it.
+A good question to ask in an interview for this problem would be whether we just need to remove the node from linked list or completely delete it from the memory.
+Since it has not been stated in this problem if the node is required somewhere else later on, its better to just remove the node from linked list as asked.
+```
+```python
+import unittest
+
+# Definition for singly-linked list.
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+    @classmethod
+    def initList(self, nums):
+        if not nums:
+            return None
+        head = None
+        current = None
+
+        for n in nums:
+            if not head:
+                head = ListNode(n)
+                current = head
+            else:
+                node = ListNode(n)
+                current.next = node
+                current = node
+        return head
+
+    @classmethod
+    def linkedListToList(self, head):
+        if not head:
+            return []
+
+        pointer = head
+        sll_list = []
+        while pointer:
+            sll_list.append(pointer.val)
+            pointer = pointer.next
+        return sll_list
+
+class Solution:
+    def removeNthFromEndUsingOnePointerTwoPass(self, head: ListNode, n: int) -> ListNode:
+	    ptr, length = head, 0
+	    while ptr:
+		    ptr, length = ptr.next, length + 1
+	    if length == n : return head.next
+	    ptr = head
+	    for i in range(1, length - n):
+		    ptr = ptr.next
+	    ptr.next = ptr.next.next
+	    return head
+
+    def removeNthFromEndUsingTwoPointersOnePass(self, head: ListNode, n: int) -> ListNode:
+	    fast = slow = head
+	    for i in range(n):
+		    fast = fast.next
+	    if not fast: return head.next
+	    while fast.next:
+		    fast, slow = fast.next, slow.next
+	    slow.next = slow.next.next
+	    return head
+
+class Test(unittest.TestCase):
+    def setUp(self) -> None:
+        pass
+
+    def tearDown(self) -> None:
+        pass
+
+    def test_removeNthFromEnd(self) -> None:
+        sol = Solution()
+        for head, n, solution in (
+            [
+                [1, 2, 3, 4, 5], 2,
+                [1, 2, 3, 5],
+            ],
+            [
+                [1], 1,
+                []
+            ],
+            [
+                [1, 2], 1,
+                [1]
+            ]
+        ):
+            self.assertEqual(
+                ListNode.linkedListToList(sol.removeNthFromEndUsingOnePointerTwoPass(ListNode.initList(head), n)),
+                solution
+            )
+            self.assertEqual(
+                ListNode.linkedListToList(sol.removeNthFromEndUsingTwoPointersOnePass(ListNode.initList(head), n)),
+                solution
+            )
+
+if __name__ == "__main__":
+    unittest.main()
+```
+```kotlin
+// Definition for singly-linked list.
+class ListNode(var `val`: Int) {
+    var next: ListNode? = null
+}
+
+fun removeNthFromEnd(head: ListNode?, n: Int): ListNode? {
+    val dummy = ListNode(-1)
+    dummy.next = head
+
+    var p: ListNode? = dummy
+    var q: ListNode? = dummy
+
+    for (i in 0..n) q = q?.next
+
+    while (q != null) {
+        p = p?.next
+        q = q?.next
+    }
+
+    p?.next = p?.next?.next
+
+    return dummy.next        
+}
+```
+
+<br/>
+<div align="right">
+    <b><a href="#algorithms">⬆️ Back to Top</a></b>
+</div>
+<br/>
+
+#### [LC-143:Reorder List](https://leetcode.com/problems/reorder-list/)
+##### Solution Explanation:
+```
+
+```
+##### Complexity Analysis:
+```
+```
+```python
+import unittest
+
+# Definition for singly-linked list.
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+    @classmethod
+    def initList(self, nums):
+        if not nums:
+            return None
+        head = None
+        current = None
+
+        for n in nums:
+            if not head:
+                head = ListNode(n)
+                current = head
+            else:
+                node = ListNode(n)
+                current.next = node
+                current = node
+        return head
+
+    @classmethod
+    def linkedListToList(self, head):
+        if not head:
+            return []
+
+        pointer = head
+        sll_list = []
+        while pointer:
+            sll_list.append(pointer.val)
+            pointer = pointer.next
+        return sll_list
+
+class Solution:
+    def reorderList(self, head: ListNode) -> None:
+        if not head: return
+
+        # step 1: find the mid point
+        slow = fast = head
+        while fast and fast.next:
+            slow, fast = slow.next, fast.next.next
+        slow.next, slow = None, slow.next
+
+        # step 2: reverse the second half
+        pre = None
+        while slow:
+            slow.next, pre, slow = pre, slow, slow.next
+
+        # step 3: merge lists ( or, mix the halves )
+        while pre:
+            head.next, pre.next, pre, head = pre, head.next, pre.next, head.next
+			
+class Test(unittest.TestCase):
+    def setUp(self) -> None:
+        pass
+
+    def tearDown(self) -> None:
+        pass
+
+    def test_reorderList(self) -> None:
+        solution = Solution()
+		head = [1,2,3,4]
+		solution.reorderList(LinkedList.initList(head))
+		self.assertEqual([1,4,2,3], LinkedList.linkedListToList(head))
+		head = [1,2,3,4,5]
+		solution.reorderList(LinkedList.initList(head))
+		self.assertEqual([1,5,2,4,3], LinkedList.linkedListToList(head))
+
+if __name__ == "__main__":
+    unittest.main()
+```
+```kotlin
+// Definition for singly-linked list.
+class ListNode(var `val`: Int) {
+   var next: ListNode? = null
+}
+
+fun reverse(head: ListNode?): ListNode? {
+    var prev: ListNode? = null
+    var curr = head
+    while (curr != null) {
+        val next_Node = curr.next
+        curr.next = prev
+        prev = curr
+        curr = next_Node
+    }
+    return prev
+}
+
+fun merge(l1: ListNode?, l2: ListNode?) {
+    var l1 = l1
+    var l2 = l2
+    while (l1 != null) {
+        val l1_next = l1.next
+        val l2_next = l2!!.next
+        l1.next = l2
+        if (l1_next == null) break
+        l2.next = l1_next
+        l1 = l1_next
+        l2 = l2_next
+    }
+}
+
+fun reorderList(head: ListNode?) {
+    if (head == null || head.next == null) return
+    val l1: ListNode = head
+    var slow = head
+    var fast = head
+    var prev: ListNode? = null
+    while (fast != null && fast.next != null) {
+        prev = slow
+        slow = slow!!.next
+        fast = fast.next!!.next
+    }
+    prev!!.next = null
+    val l2 = reverse(slow)
+    merge(l1, l2)
+}
+```
+
 ## String
 | #     | Title	                                         | url                                                                           | Time   | Space   | Difficulty | Tag	        | Note                   |
 | ----- | ---------------------------------------------- | ----------------------------------------------------------------------------- | ------ | ------- | ---------- | ------------ | ---------------------- |
