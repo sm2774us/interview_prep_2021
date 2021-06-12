@@ -7595,7 +7595,7 @@ Complexity Analysis
 	+ We can merge two sorted linked list in O(n) time where nn is the total number of nodes in two lists.
 	+ Sum up the merge process and we can get: 
 ```
->      ![equation](https://latex.codecogs.com/png.image?\dpi{150}%20O(\sum_{i=1}^{log_{2}k}N)=O(Nlogk))
+>- ![equation](https://latex.codecogs.com/png.image?\dpi{150}%20O(\sum_{i=1}^{log_{2}k}N)=O(Nlogk))
 >
 ```
 - Space complexity : O(1)
