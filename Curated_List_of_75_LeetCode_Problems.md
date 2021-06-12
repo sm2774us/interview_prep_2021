@@ -7596,6 +7596,7 @@ Complexity Analysis
 	+ Sum up the merge process and we can get: 
 ```
 >      ![equation](https://latex.codecogs.com/png.image?\dpi{150}%20O(\sum_{i=1}^{log_{2}k}N)=O(Nlogk))
+>
 ```
 - Space complexity : O(1)
 
